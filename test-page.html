@@ -1,0 +1,844 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Прохождение теста — OGE Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="global.css">
+  <link rel="stylesheet" href="components.css">
+  <link rel="stylesheet" href="auth.css">
+  <style>
+    .test-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .test-header {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    
+    .test-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    
+    .test-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 16px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    
+    .test-timer {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+    
+    .test-progress {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+    
+    .test-navigation {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding: 16px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .nav-button {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .nav-button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+    
+    .nav-button:disabled {
+      background: #e5e7eb;
+      color: #9ca3af;
+      cursor: not-allowed;
+    }
+    
+    .task-counter {
+      font-weight: 600;
+      color: var(--text);
+    }
+    
+    .task-card {
+      background: white;
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .task-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    
+    .task-number {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 16px;
+      font-weight: 700;
+    }
+    
+    .task-difficulty {
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .difficulty-1 { background: #d1fae5; color: #065f46; }
+    .difficulty-2 { background: #fef3c7; color: #92400e; }
+    .difficulty-3 { background: #fed7aa; color: #c2410c; }
+    .difficulty-4 { background: #fecaca; color: #dc2626; }
+    .difficulty-5 { background: #f3e8ff; color: #7c3aed; }
+    
+    .task-question {
+      font-size: 18px;
+      line-height: 1.6;
+      margin-bottom: 24px;
+      color: var(--text);
+    }
+    
+    .task-options {
+      display: grid;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .task-option {
+      display: flex;
+      align-items: center;
+      padding: 16px 20px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: white;
+    }
+    
+    .task-option:hover {
+      border-color: var(--primary);
+      background: #f8f9fe;
+    }
+    
+    .task-option.selected {
+      border-color: var(--primary);
+      background: linear-gradient(135deg, #f0f4ff, #e8f2ff);
+    }
+    
+    .task-option input[type="radio"] {
+      margin-right: 16px;
+      transform: scale(1.2);
+    }
+    
+    .task-option input[type="text"] {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    
+    .task-option input[type="text"]:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    
+    .test-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .btn-finish {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      border: none;
+      padding: 16px 32px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-finish:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+    }
+    
+    .btn-finish:disabled {
+      background: #e5e7eb;
+      color: #9ca3af;
+      cursor: not-allowed;
+    }
+    
+    .test-summary {
+      background: white;
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .summary-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      text-align: center;
+      color: var(--text);
+    }
+    
+    .summary-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .summary-stat {
+      background: linear-gradient(135deg, #f0f4ff, #e8f2ff);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+    
+    .summary-stat-number {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+    
+    .summary-stat-label {
+      font-size: 14px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    
+    .summary-actions {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    .btn-retry {
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-retry:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(245, 87, 108, 0.4);
+    }
+    
+    .btn-dashboard {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-dashboard:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+    }
+    
+    .error {
+      background: #fecaca;
+      color: #dc2626;
+      padding: 20px;
+      border-radius: 12px;
+      margin: 20px 0;
+      text-align: center;
+    }
+    
+    .timer-warning {
+      background: #fef3c7;
+      color: #92400e;
+      padding: 12px 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      text-align: center;
+      font-weight: 600;
+    }
+    
+    .timer-critical {
+      background: #fecaca;
+      color: #dc2626;
+      animation: pulse 1s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.7; }
+      100% { opacity: 1; }
+    }
+    
+    @media (max-width: 768px) {
+      .test-container {
+        padding: 16px;
+      }
+      
+      .test-info {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .test-navigation {
+        flex-direction: column;
+        gap: 16px;
+      }
+      
+      .test-actions {
+        flex-direction: column;
+        gap: 16px;
+      }
+      
+      .summary-actions {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header site-header-dark">
+    <div class="container nav">
+      <div class="logo">OGE</div>
+      <div class="nav-center">
+        <nav class="menu nav-pill">
+          <a href="index.html">Главная</a>
+          <a href="about.html">О нас</a>
+          <a href="pricing.html">Тарифы</a>
+          <a href="tasks.html">Карта заданий</a>
+          <a href="tasks-database.html">База заданий</a>
+        </nav>
+      </div>
+      <div class="actions">
+        <a href="#login" class="btn btn-ghost">Войти</a>
+        <a href="#signup" class="btn btn-primary">Попробовать</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="test-container">
+      <!-- Заголовок теста -->
+      <div class="test-header" id="testHeader">
+        <div class="test-title" id="testTitle">Загрузка теста...</div>
+        <div class="test-info">
+          <div class="test-timer" id="testTimer">00:00:00</div>
+          <div class="test-progress" id="testProgress">0 / 0</div>
+        </div>
+      </div>
+
+      <!-- Предупреждение о времени -->
+      <div class="timer-warning" id="timerWarning" style="display: none;">
+        ⏰ Осталось менее 10 минут!
+      </div>
+
+      <!-- Навигация -->
+      <div class="test-navigation" id="testNavigation" style="display: none;">
+        <button class="nav-button" id="prevButton" onclick="previousTask()">← Предыдущее</button>
+        <div class="task-counter" id="taskCounter">Задание 1 из 20</div>
+        <button class="nav-button" id="nextButton" onclick="nextTask()">Следующее →</button>
+      </div>
+
+      <!-- Задание -->
+      <div class="task-card" id="taskCard" style="display: none;">
+        <div class="task-header">
+          <div class="task-number" id="taskNumber">Задание 1</div>
+          <div class="task-difficulty" id="taskDifficulty">Уровень 2</div>
+        </div>
+        <div class="task-question" id="taskQuestion">Загрузка вопроса...</div>
+        <div class="task-options" id="taskOptions">
+          <!-- Варианты ответов будут загружены динамически -->
+        </div>
+      </div>
+
+      <!-- Действия -->
+      <div class="test-actions" id="testActions" style="display: none;">
+        <div>
+          <button class="nav-button" onclick="previousTask()" id="prevActionButton">← Предыдущее</button>
+        </div>
+        <div>
+          <button class="btn-finish" onclick="finishTest()" id="finishButton">Завершить тест</button>
+        </div>
+        <div>
+          <button class="nav-button" onclick="nextTask()" id="nextActionButton">Следующее →</button>
+        </div>
+      </div>
+
+      <!-- Результаты -->
+      <div class="test-summary" id="testSummary" style="display: none;">
+        <div class="summary-title">Результаты теста</div>
+        <div class="summary-stats">
+          <div class="summary-stat">
+            <div class="summary-stat-number" id="scoreNumber">0</div>
+            <div class="summary-stat-label">Баллов набрано</div>
+          </div>
+          <div class="summary-stat">
+            <div class="summary-stat-number" id="maxScoreNumber">0</div>
+            <div class="summary-stat-label">Максимум баллов</div>
+          </div>
+          <div class="summary-stat">
+            <div class="summary-stat-number" id="percentageNumber">0%</div>
+            <div class="summary-stat-label">Процент выполнения</div>
+          </div>
+          <div class="summary-stat">
+            <div class="summary-stat-number" id="timeSpentNumber">0:00</div>
+            <div class="summary-stat-label">Время выполнения</div>
+          </div>
+        </div>
+        <div class="summary-actions">
+          <button class="btn-retry" onclick="retryTest()">Повторить тест</button>
+          <button class="btn-dashboard" onclick="goToDashboard()">В личный кабинет</button>
+        </div>
+      </div>
+
+      <!-- Загрузка -->
+      <div class="loading" id="loading">
+        <h3>Загрузка теста...</h3>
+        <p>Пожалуйста, подождите</p>
+      </div>
+
+      <!-- Ошибка -->
+      <div class="error" id="error" style="display: none;">
+        <h3>Ошибка загрузки теста</h3>
+        <p id="errorMessage"></p>
+        <button class="btn-retry" onclick="location.reload()">Обновить страницу</button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Глобальные переменные
+    let currentTest = null;
+    let currentTaskIndex = 0;
+    let userAnswers = {};
+    let startTime = null;
+    let timerInterval = null;
+    let testVariantId = null;
+
+    // API клиент
+    const API_BASE = window.location.origin;
+
+    async function apiCall(endpoint, options = {}) {
+      try {
+        const response = await fetch(`${API_BASE}${endpoint}`, {
+          headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+          },
+          ...options
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        return await response.json();
+      } catch (error) {
+        console.error('API call failed:', error);
+        throw error;
+      }
+    }
+
+    // Инициализация теста
+    async function initTest() {
+      try {
+        // Получаем ID варианта из URL параметров
+        const urlParams = new URLSearchParams(window.location.search);
+        testVariantId = urlParams.get('variant');
+        
+        if (!testVariantId) {
+          throw new Error('ID варианта не указан в URL');
+        }
+        
+        // Загружаем вариант теста
+        const data = await apiCall(`/api/variants/${testVariantId}`);
+        currentTest = data;
+        
+        // Инициализируем интерфейс
+        initTestInterface();
+        
+        // Показываем первое задание
+        showTask(0);
+        
+        // Запускаем таймер
+        startTimer();
+        
+      } catch (error) {
+        showError('Ошибка загрузки теста: ' + error.message);
+      }
+    }
+
+    function initTestInterface() {
+      // Заголовок теста
+      document.getElementById('testTitle').textContent = currentTest.variant.variant_name;
+      
+      // Прогресс
+      document.getElementById('testProgress').textContent = 
+        `0 / ${currentTest.tasks.length}`;
+      
+      // Счетчик заданий
+      document.getElementById('taskCounter').textContent = 
+        `Задание 1 из ${currentTest.tasks.length}`;
+      
+      // Показываем интерфейс
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('testNavigation').style.display = 'flex';
+      document.getElementById('taskCard').style.display = 'block';
+      document.getElementById('testActions').style.display = 'flex';
+      
+      // Обновляем кнопки навигации
+      updateNavigationButtons();
+    }
+
+    function showTask(taskIndex) {
+      if (taskIndex < 0 || taskIndex >= currentTest.tasks.length) {
+        return;
+      }
+      
+      currentTaskIndex = taskIndex;
+      const task = currentTest.tasks[taskIndex];
+      
+      // Номер задания
+      document.getElementById('taskNumber').textContent = `Задание ${taskIndex + 1}`;
+      
+      // Сложность
+      const difficultyDiv = document.getElementById('taskDifficulty');
+      difficultyDiv.textContent = `Уровень ${task.difficulty_level}`;
+      difficultyDiv.className = `task-difficulty difficulty-${task.difficulty_level}`;
+      
+      // Вопрос
+      document.getElementById('taskQuestion').textContent = task.question_text;
+      
+      // Варианты ответов
+      const optionsContainer = document.getElementById('taskOptions');
+      
+      if (task.task_type === 'multiple_choice') {
+        optionsContainer.innerHTML = task.answerOptions.map((option, index) => `
+          <div class="task-option" onclick="selectOption(${task.id}, '${option.option_text}')">
+            <input type="radio" name="task-${task.id}" value="${option.option_text}">
+            <span>${option.option_text}</span>
+          </div>
+        `).join('');
+        
+        // Восстанавливаем выбранный ответ
+        if (userAnswers[task.id]) {
+          const selectedOption = optionsContainer.querySelector(`input[value="${userAnswers[task.id]}"]`);
+          if (selectedOption) {
+            selectedOption.checked = true;
+            selectedOption.closest('.task-option').classList.add('selected');
+          }
+        }
+      } else {
+        optionsContainer.innerHTML = `
+          <div class="task-option">
+            <input type="text" placeholder="Введите ваш ответ" 
+                   value="${userAnswers[task.id] || ''}" 
+                   onchange="saveTextAnswer(${task.id}, this.value)">
+          </div>
+        `;
+      }
+      
+      // Обновляем счетчик
+      document.getElementById('taskCounter').textContent = 
+        `Задание ${taskIndex + 1} из ${currentTest.tasks.length}`;
+      
+      // Обновляем прогресс
+      document.getElementById('testProgress').textContent = 
+        `${taskIndex + 1} / ${currentTest.tasks.length}`;
+      
+      // Обновляем кнопки навигации
+      updateNavigationButtons();
+    }
+
+    function selectOption(taskId, optionText) {
+      // Убираем выделение с других вариантов
+      document.querySelectorAll(`#taskOptions .task-option`).forEach(option => {
+        option.classList.remove('selected');
+      });
+      
+      // Выделяем выбранный вариант
+      event.target.closest('.task-option').classList.add('selected');
+      
+      // Сохраняем ответ
+      userAnswers[taskId] = optionText;
+    }
+
+    function saveTextAnswer(taskId, answer) {
+      userAnswers[taskId] = answer;
+    }
+
+    function previousTask() {
+      if (currentTaskIndex > 0) {
+        showTask(currentTaskIndex - 1);
+      }
+    }
+
+    function nextTask() {
+      if (currentTaskIndex < currentTest.tasks.length - 1) {
+        showTask(currentTaskIndex + 1);
+      }
+    }
+
+    function updateNavigationButtons() {
+      const prevButton = document.getElementById('prevButton');
+      const nextButton = document.getElementById('nextButton');
+      const prevActionButton = document.getElementById('prevActionButton');
+      const nextActionButton = document.getElementById('nextActionButton');
+      
+      const isFirst = currentTaskIndex === 0;
+      const isLast = currentTaskIndex === currentTest.tasks.length - 1;
+      
+      prevButton.disabled = isFirst;
+      nextButton.disabled = isLast;
+      prevActionButton.disabled = isFirst;
+      nextActionButton.disabled = isLast;
+    }
+
+    // Таймер
+    function startTimer() {
+      startTime = new Date();
+      timerInterval = setInterval(updateTimer, 1000);
+    }
+
+    function updateTimer() {
+      if (!startTime) return;
+      
+      const now = new Date();
+      const elapsed = now - startTime;
+      const seconds = Math.floor(elapsed / 1000);
+      const minutes = Math.floor(seconds / 60);
+      const hours = Math.floor(minutes / 60);
+      
+      const timeString = `${hours.toString().padStart(2, '0')}:${(minutes % 60).toString().padStart(2, '0')}:${(seconds % 60).toString().padStart(2, '0')}`;
+      document.getElementById('testTimer').textContent = timeString;
+      
+      // Проверяем оставшееся время (если есть лимит)
+      if (currentTest.variant.time_limit) {
+        const timeLimitSeconds = currentTest.variant.time_limit * 60;
+        const remainingSeconds = timeLimitSeconds - seconds;
+        
+        if (remainingSeconds <= 0) {
+          finishTest();
+          return;
+        }
+        
+        if (remainingSeconds <= 600) { // 10 минут
+          const warningDiv = document.getElementById('timerWarning');
+          warningDiv.style.display = 'block';
+          
+          if (remainingSeconds <= 300) { // 5 минут
+            warningDiv.classList.add('timer-critical');
+          }
+        }
+      }
+    }
+
+    // Завершение теста
+    async function finishTest() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+      }
+      
+      // Собираем ответы
+      const answers = Object.entries(userAnswers).map(([taskId, userAnswer]) => ({
+        taskId: parseInt(taskId),
+        userAnswer: userAnswer
+      }));
+      
+      // Вычисляем время выполнения
+      const timeSpent = Math.floor((new Date() - startTime) / 1000);
+      
+      try {
+        // Отправляем результаты на сервер
+        const result = await apiCall('/api/test-results', {
+          method: 'POST',
+          body: JSON.stringify({
+            userId: 1, // Временный ID пользователя
+            variantId: parseInt(testVariantId),
+            answers: answers,
+            timeSpent: timeSpent
+          })
+        });
+        
+        // Показываем результаты
+        showResults(result);
+        
+      } catch (error) {
+        console.error('Error saving results:', error);
+        // Показываем результаты локально
+        showResults({
+          score: calculateLocalScore(),
+          maxScore: calculateMaxScore(),
+          percentage: calculatePercentage()
+        });
+      }
+    }
+
+    function calculateLocalScore() {
+      let score = 0;
+      currentTest.tasks.forEach(task => {
+        const userAnswer = userAnswers[task.id];
+        if (!userAnswer) return;
+        
+        let isCorrect = false;
+        
+        if (task.task_type === 'multiple_choice') {
+          const correctOption = task.answerOptions.find(opt => opt.is_correct);
+          isCorrect = userAnswer === correctOption?.option_text;
+        } else {
+          isCorrect = userAnswer.toString().toLowerCase().trim() === 
+                     task.correct_answer.toString().toLowerCase().trim();
+        }
+        
+        if (isCorrect) {
+          score += task.points || 1;
+        }
+      });
+      
+      return score;
+    }
+
+    function calculateMaxScore() {
+      return currentTest.tasks.reduce((sum, task) => sum + (task.points || 1), 0);
+    }
+
+    function calculatePercentage() {
+      const score = calculateLocalScore();
+      const maxScore = calculateMaxScore();
+      return maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
+    }
+
+    function showResults(result) {
+      // Скрываем интерфейс теста
+      document.getElementById('testNavigation').style.display = 'none';
+      document.getElementById('taskCard').style.display = 'none';
+      document.getElementById('testActions').style.display = 'none';
+      document.getElementById('timerWarning').style.display = 'none';
+      
+      // Показываем результаты
+      document.getElementById('scoreNumber').textContent = result.score;
+      document.getElementById('maxScoreNumber').textContent = result.maxScore;
+      document.getElementById('percentageNumber').textContent = result.percentage + '%';
+      
+      const timeSpent = Math.floor((new Date() - startTime) / 1000);
+      const minutes = Math.floor(timeSpent / 60);
+      const seconds = timeSpent % 60;
+      document.getElementById('timeSpentNumber').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+      
+      document.getElementById('testSummary').style.display = 'block';
+    }
+
+    function retryTest() {
+      // Сбрасываем состояние
+      currentTaskIndex = 0;
+      userAnswers = {};
+      startTime = null;
+      
+      // Показываем первое задание
+      showTask(0);
+      
+      // Запускаем таймер заново
+      startTimer();
+      
+      // Скрываем результаты
+      document.getElementById('testSummary').style.display = 'none';
+      
+      // Показываем интерфейс теста
+      document.getElementById('testNavigation').style.display = 'flex';
+      document.getElementById('taskCard').style.display = 'block';
+      document.getElementById('testActions').style.display = 'flex';
+    }
+
+    function goToDashboard() {
+      window.location.href = 'dashboard.html';
+    }
+
+    function showError(message) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('errorMessage').textContent = message;
+      document.getElementById('error').style.display = 'block';
+    }
+
+    // Инициализация при загрузке страницы
+    document.addEventListener('DOMContentLoaded', function() {
+      initTest();
+    });
+
+    // Предотвращение случайного закрытия страницы
+    window.addEventListener('beforeunload', function(e) {
+      if (currentTest && !document.getElementById('testSummary').style.display !== 'none') {
+        e.preventDefault();
+        e.returnValue = 'Вы уверены, что хотите покинуть страницу? Ваш прогресс будет потерян.';
+      }
+    });
+  </script>
+</body>
+</html>
+

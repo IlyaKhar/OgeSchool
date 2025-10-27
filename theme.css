@@ -1,0 +1,10 @@
+﻿:root{
+  --bg:#ffffff;--bg-muted:#f6f8fa;--text:#0b1220;--text-muted:#5b6877;
+  --primary:#155EEF;--border:#e5e7eb;
+  --shadow:0 6px 24px rgba(15,23,42,.06),0 2px 8px rgba(15,23,42,.04)
+}
+.dark{
+  --bg:#0b1220;--bg-muted:#0f172a;--text:#e2e8f0;--text-muted:#94a3b8;
+  --primary:#60a5fa;--border:#1f2937;
+  --shadow:0 6px 24px rgba(0,0,0,.35),0 2px 8px rgba(0,0,0,.25)
+}

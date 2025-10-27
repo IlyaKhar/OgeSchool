@@ -1,0 +1,32 @@
+{
+  "name": "ege-platform",
+  "version": "1.0.0",
+  "description": "Платформа для подготовки к ЕГЭ/ОГЭ с интеграцией OpenAI API",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "setup-db": "node setup-database.js",
+    "init-db": "node database/init.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "multer": "^1.4.5-lts.1",
+    "sqlite3": "^5.1.6"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [
+    "ege",
+    "oge",
+    "education",
+    "ai",
+    "openai"
+  ],
+  "author": "EGE Platform Team",
+  "license": "MIT"
+}
