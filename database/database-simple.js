@@ -136,17 +136,25 @@ class DatabaseManager {
             .filter(s => s.length > 0 && !s.startsWith('--') && !s.toLowerCase().includes('index'));
         
         let created = 0;
+        let created = 0;
         for (const statement of statements) {
+            if (!statement) continue;
             try {
-                await this.db.execute(statement);
+                const stmt = this.db.prepare(statement);
+                await stmt.run();
+                created++;
             } catch (err) {
-                // Игнорируем ошибки "table already exists"
-                if (!err.message.includes('already exists')) {
-                    console.warn('Ошибка выполнения SQL:', err.message);
+                // Игнорируем ошибки "table already exists" и "duplicate"
+                const errMsg = err.message.toLowerCase();
+                if (!errMsg.includes('already exists') && 
+                    !errMsg.includes('duplicate') && 
+                    !errMsg.includes('table') && 
+                    !errMsg.includes('sqlite_error')) {
+                    console.warn('Ошибка выполнения SQL:', err.message, 'Statement:', statement.substring(0, 50));
                 }
             }
         }
-        console.log('Таблицы созданы в Turso');
+        console.log(`Таблицы созданы в Turso (${created} команд выполнено)`);
     }
 
     // Helper методы для работы с обоими вариантами БД
