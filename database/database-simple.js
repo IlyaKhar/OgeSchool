@@ -147,17 +147,38 @@ class DatabaseManager {
     async executeQuery(sql, args = []) {
         await this.ensureInit();
         if (this.isTurso) {
-            const result = await this.db.execute({
-                sql,
-                args
-            });
-            return result.rows.map(row => {
-                const obj = {};
-                for (const [key, value] of Object.entries(row)) {
-                    obj[key] = value;
+            try {
+                const result = await this.db.execute({
+                    sql,
+                    args
+                });
+                // Turso возвращает rows как массив объектов
+                if (!result.rows || !Array.isArray(result.rows)) {
+                    return [];
                 }
-                return obj;
-            });
+                return result.rows.map(row => {
+                    // Turso возвращает объекты напрямую, но нужно проверить формат
+                    if (typeof row === 'object' && row !== null) {
+                        const obj = {};
+                        // Если это Map или объект с методами, конвертируем
+                        if (row.entries) {
+                            for (const [key, value] of row.entries()) {
+                                obj[key] = value;
+                            }
+                        } else {
+                            // Обычный объект
+                            for (const key in row) {
+                                obj[key] = row[key];
+                            }
+                        }
+                        return obj;
+                    }
+                    return row;
+                });
+            } catch (error) {
+                console.error('Ошибка executeQuery (Turso):', error.message, 'SQL:', sql.substring(0, 100));
+                throw error;
+            }
         } else {
             const stmt = this.db.prepare(sql);
             return args.length > 0 ? stmt.all(...args) : stmt.all();
@@ -167,17 +188,31 @@ class DatabaseManager {
     async executeQueryOne(sql, args = []) {
         await this.ensureInit();
         if (this.isTurso) {
-            const result = await this.db.execute({
-                sql,
-                args
-            });
-            if (result.rows.length === 0) return null;
-            const row = result.rows[0];
-            const obj = {};
-            for (const [key, value] of Object.entries(row)) {
-                obj[key] = value;
+            try {
+                const result = await this.db.execute({
+                    sql,
+                    args
+                });
+                if (!result.rows || result.rows.length === 0) return null;
+                const row = result.rows[0];
+                if (typeof row === 'object' && row !== null) {
+                    const obj = {};
+                    if (row.entries) {
+                        for (const [key, value] of row.entries()) {
+                            obj[key] = value;
+                        }
+                    } else {
+                        for (const key in row) {
+                            obj[key] = row[key];
+                        }
+                    }
+                    return obj;
+                }
+                return row;
+            } catch (error) {
+                console.error('Ошибка executeQueryOne (Turso):', error.message, 'SQL:', sql.substring(0, 100));
+                throw error;
             }
-            return obj;
         } else {
             const stmt = this.db.prepare(sql);
             return args.length > 0 ? stmt.get(...args) : stmt.get();
@@ -187,11 +222,17 @@ class DatabaseManager {
     async executeInsert(sql, args = []) {
         await this.ensureInit();
         if (this.isTurso) {
-            const result = await this.db.execute({
-                sql,
-                args
-            });
-            return { lastInsertRowid: result.lastInsertRowid || result.rowsAffected };
+            try {
+                const result = await this.db.execute({
+                    sql,
+                    args
+                });
+                // Turso возвращает lastInsertRowid в result.lastInsertRowid
+                return { lastInsertRowid: result.lastInsertRowid || result.rowsAffected || 0 };
+            } catch (error) {
+                console.error('Ошибка executeInsert (Turso):', error.message, 'SQL:', sql.substring(0, 100));
+                throw error;
+            }
         } else {
             const stmt = this.db.prepare(sql);
             const result = args.length > 0 ? stmt.run(...args) : stmt.run();
@@ -202,11 +243,16 @@ class DatabaseManager {
     async executeUpdate(sql, args = []) {
         await this.ensureInit();
         if (this.isTurso) {
-            const result = await this.db.execute({
-                sql,
-                args
-            });
-            return { changes: result.rowsAffected || 0 };
+            try {
+                const result = await this.db.execute({
+                    sql,
+                    args
+                });
+                return { changes: result.rowsAffected || 0 };
+            } catch (error) {
+                console.error('Ошибка executeUpdate (Turso):', error.message, 'SQL:', sql.substring(0, 100));
+                throw error;
+            }
         } else {
             const stmt = this.db.prepare(sql);
             const result = args.length > 0 ? stmt.run(...args) : stmt.run();
