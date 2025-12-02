@@ -86,9 +86,13 @@ class DatabaseManager {
             try {
                 await this.createTablesAsync();
                 this.tablesCreated = true;
+                console.log('Таблицы Turso готовы к использованию');
             } catch (err) {
                 // Игнорируем ошибки "table already exists"
-                if (!err.message.includes('already exists') && !err.message.includes('duplicate')) {
+                const errMsg = err.message.toLowerCase();
+                if (!errMsg.includes('already exists') && 
+                    !errMsg.includes('duplicate') &&
+                    !errMsg.includes('table')) {
                     console.warn('Предупреждение при создании таблиц в Turso:', err.message);
                 }
                 this.tablesCreated = true;
@@ -153,7 +157,7 @@ class DatabaseManager {
                     args
                 });
                 // Turso возвращает rows как массив объектов
-                if (!result.rows || !Array.isArray(result.rows)) {
+                if (!result || !result.rows || !Array.isArray(result.rows)) {
                     return [];
                 }
                 return result.rows.map(row => {
@@ -161,21 +165,44 @@ class DatabaseManager {
                     if (typeof row === 'object' && row !== null) {
                         const obj = {};
                         // Если это Map или объект с методами, конвертируем
-                        if (row.entries) {
+                        if (row.entries && typeof row.entries === 'function') {
                             for (const [key, value] of row.entries()) {
                                 obj[key] = value;
                             }
                         } else {
-                            // Обычный объект
-                            for (const key in row) {
+                            // Обычный объект - используем Object.keys для надежности
+                            Object.keys(row).forEach(key => {
                                 obj[key] = row[key];
-                            }
+                            });
                         }
                         return obj;
                     }
                     return row;
                 });
             } catch (error) {
+                // Если таблица не существует, пытаемся создать таблицы и повторить
+                if (error.message && error.message.toLowerCase().includes('no such table')) {
+                    console.log('Таблица не найдена, создаем таблицы...');
+                    if (!this.tablesCreated) {
+                        this.tablesCreated = false; // Сбрасываем флаг
+                        await this.ensureInit(); // Повторно создаем таблицы
+                        // Повторяем запрос
+                        const result = await this.db.execute({ sql, args });
+                        if (!result || !result.rows || !Array.isArray(result.rows)) {
+                            return [];
+                        }
+                        return result.rows.map(row => {
+                            if (typeof row === 'object' && row !== null) {
+                                const obj = {};
+                                Object.keys(row).forEach(key => {
+                                    obj[key] = row[key];
+                                });
+                                return obj;
+                            }
+                            return row;
+                        });
+                    }
+                }
                 console.error('Ошибка executeQuery (Turso):', error.message, 'SQL:', sql.substring(0, 100));
                 throw error;
             }
