@@ -8,8 +8,20 @@ const connectDB = async () => {
   try {
     const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/oge-platform';
     
-    // В новых версиях mongoose опции useNewUrlParser и useUnifiedTopology не нужны
-    await mongoose.connect(mongoURI);
+    // Проверяем, не подключены ли уже
+    if (mongoose.connection.readyState === 1) {
+      console.log('MongoDB уже подключена');
+      return mongoose.connection;
+    }
+    
+    // Настройки для Vercel (увеличенные таймауты, отключена буферизация)
+    await mongoose.connect(mongoURI, {
+      serverSelectionTimeoutMS: 30000, // 30 секунд вместо 10
+      socketTimeoutMS: 45000, // 45 секунд
+      connectTimeoutMS: 30000, // 30 секунд
+      bufferMaxEntries: 0, // Отключаем буферизацию
+      bufferCommands: false, // Отключаем буферизацию команд
+    });
     
     console.log('MongoDB подключена успешно');
     console.log(`📊 База данных: ${mongoose.connection.name}`);
@@ -35,6 +47,19 @@ const disconnectDB = async () => {
     console.error('Ошибка отключения от MongoDB:', error.message);
   }
 };
+
+// Обработка событий подключения
+mongoose.connection.on('connected', () => {
+  console.log('MongoDB connection established');
+});
+
+mongoose.connection.on('error', (err) => {
+  console.error('MongoDB connection error:', err.message);
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.log('MongoDB disconnected');
+});
 
 module.exports = {
   connectDB,
