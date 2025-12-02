@@ -7,15 +7,31 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "setup-db": "node setup-database.js",
-    "init-db": "node database/init.js"
+    "init-db": "node database/init.js",
+    "migrate-mongo": "node src/scripts/migrate-to-mongodb.js",
+    "setup-ollama": "node scripts/setup-ollama.js",
+    "train-ollama": "node scripts/train-ollama.js",
+    "update-to-qwen": "node scripts/update-to-qwen.js",
+    "prepare-training": "node scripts/prepare-training-data.js",
+    "parse-pdf": "node scripts/parse-pdf-variant.js",
+    "import-variants": "node scripts/import-variants.js"
   },
   "dependencies": {
     "axios": "^1.6.0",
+    "bcryptjs": "^3.0.3",
+    "better-sqlite3": "^12.5.0",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "express-rate-limit": "^7.5.1",
+    "express-validator": "^7.3.1",
+    "helmet": "^7.2.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^9.0.0",
     "multer": "^1.4.5-lts.1",
-    "sqlite3": "^5.1.6"
+    "nodemailer": "^7.0.11",
+    "pdf-parse": "^1.1.4",
+    "stripe": "^20.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"

@@ -1,0 +1,65 @@
+[
+  {
+    "name": "Вариант 2 - Математика ОГЭ",
+    "subject": "Математика",
+    "subjectCode": "math",
+    "topic": "Геометрия",
+    "description": "Второй вариант по математике с заданиями по геометрии",
+    "timeLimit": 180,
+    "isPublished": true,
+    "tasks": [
+      {
+        "questionText": "В прямоугольном треугольнике катеты равны 3 см и 4 см. Найдите гипотенузу.",
+        "taskType": "short_answer",
+        "correctAnswer": "5",
+        "explanation": "Используем теорему Пифагора: c² = a² + b² = 3² + 4² = 9 + 16 = 25. Следовательно, c = √25 = 5 см.",
+        "solutionSteps": [
+          "Применяем теорему Пифагора: c² = a² + b²",
+          "c² = 3² + 4² = 9 + 16 = 25",
+          "c = √25 = 5 см"
+        ],
+        "difficultyLevel": 2,
+        "points": 1
+      },
+      {
+        "questionText": "Площадь прямоугольника равна 24 см², одна из сторон равна 6 см. Найдите вторую сторону.",
+        "taskType": "short_answer",
+        "correctAnswer": "4",
+        "explanation": "Площадь прямоугольника S = a × b. Если S = 24 и a = 6, то b = S / a = 24 / 6 = 4 см.",
+        "solutionSteps": [
+          "S = a × b",
+          "24 = 6 × b",
+          "b = 24 / 6 = 4 см"
+        ],
+        "difficultyLevel": 2,
+        "points": 1
+      },
+      {
+        "questionText": "В треугольнике ABC угол A равен 60°, угол B равен 40°. Найдите угол C.",
+        "taskType": "short_answer",
+        "correctAnswer": "80",
+        "explanation": "Сумма углов треугольника равна 180°. Поэтому угол C = 180° - 60° - 40° = 80°.",
+        "solutionSteps": [
+          "Сумма углов треугольника: A + B + C = 180°",
+          "C = 180° - A - B",
+          "C = 180° - 60° - 40° = 80°"
+        ],
+        "difficultyLevel": 2,
+        "points": 1
+      },
+      {
+        "questionText": "Радиус окружности равен 5 см. Найдите длину окружности.",
+        "taskType": "short_answer",
+        "correctAnswer": "10π",
+        "explanation": "Длина окружности вычисляется по формуле C = 2πr, где r - радиус. C = 2π × 5 = 10π см.",
+        "solutionSteps": [
+          "Формула длины окружности: C = 2πr",
+          "C = 2π × 5 = 10π см"
+        ],
+        "difficultyLevel": 2,
+        "points": 1
+      }
+    ]
+  }
+]
+

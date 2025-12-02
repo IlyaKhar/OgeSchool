@@ -1,0 +1,92 @@
+[
+  {
+    "name": "Вариант 1 - Математика ОГЭ",
+    "subject": "Математика",
+    "subjectCode": "math",
+    "topic": "Алгебра",
+    "description": "Первый вариант по математике для подготовки к ОГЭ",
+    "timeLimit": 180,
+    "isPublished": true,
+    "tasks": [
+      {
+        "questionText": "Найдите значение выражения: 2 + 3 × 4",
+        "taskType": "short_answer",
+        "correctAnswer": "14",
+        "explanation": "Сначала выполняем умножение: 3 × 4 = 12, затем сложение: 2 + 12 = 14. Важно помнить порядок операций: сначала умножение и деление, затем сложение и вычитание.",
+        "solutionSteps": [
+          "Выполняем умножение: 3 × 4 = 12",
+          "Выполняем сложение: 2 + 12 = 14"
+        ],
+        "difficultyLevel": 1,
+        "points": 1
+      },
+      {
+        "questionText": "Решите уравнение: 2x + 5 = 13",
+        "taskType": "short_answer",
+        "correctAnswer": "4",
+        "explanation": "Переносим 5 в правую часть уравнения: 2x = 13 - 5 = 8. Затем делим обе части на 2: x = 8 / 2 = 4.",
+        "solutionSteps": [
+          "2x = 13 - 5",
+          "2x = 8",
+          "x = 8 / 2",
+          "x = 4"
+        ],
+        "difficultyLevel": 2,
+        "points": 1
+      },
+      {
+        "questionText": "Какое из чисел является решением неравенства x > 5?",
+        "taskType": "multiple_choice",
+        "correctAnswer": "6",
+        "explanation": "Число 6 больше 5, поэтому является решением неравенства x > 5. Числа 4, 5 и 3 не подходят, так как они меньше или равны 5.",
+        "answerOptions": [
+          {
+            "text": "4",
+            "isCorrect": false
+          },
+          {
+            "text": "5",
+            "isCorrect": false
+          },
+          {
+            "text": "6",
+            "isCorrect": true
+          },
+          {
+            "text": "3",
+            "isCorrect": false
+          }
+        ],
+        "difficultyLevel": 2,
+        "points": 1
+      },
+      {
+        "questionText": "Решите квадратное уравнение: x² - 5x + 6 = 0",
+        "taskType": "detailed_answer",
+        "correctAnswer": "x = 2 или x = 3",
+        "explanation": "Используем формулу дискриминанта: D = b² - 4ac = (-5)² - 4×1×6 = 25 - 24 = 1. Так как D > 0, уравнение имеет два корня: x₁ = (5 + 1) / 2 = 3, x₂ = (5 - 1) / 2 = 2.",
+        "solutionSteps": [
+          "Находим дискриминант: D = b² - 4ac = (-5)² - 4×1×6 = 25 - 24 = 1",
+          "Так как D > 0, уравнение имеет два корня",
+          "x₁ = (-b + √D) / 2a = (5 + 1) / 2 = 3",
+          "x₂ = (-b - √D) / 2a = (5 - 1) / 2 = 2"
+        ],
+        "difficultyLevel": 3,
+        "points": 2
+      },
+      {
+        "questionText": "Найдите значение выражения: √(16 + 9)",
+        "taskType": "short_answer",
+        "correctAnswer": "5",
+        "explanation": "Сначала вычисляем сумму под корнем: 16 + 9 = 25. Затем извлекаем квадратный корень: √25 = 5.",
+        "solutionSteps": [
+          "16 + 9 = 25",
+          "√25 = 5"
+        ],
+        "difficultyLevel": 2,
+        "points": 1
+      }
+    ]
+  }
+]
+

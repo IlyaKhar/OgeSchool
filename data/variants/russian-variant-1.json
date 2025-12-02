@@ -1,0 +1,118 @@
+[
+  {
+    "name": "Вариант 1 - Русский язык ОГЭ",
+    "subject": "Русский язык",
+    "subjectCode": "russian",
+    "topic": "Орфография",
+    "description": "Первый вариант по русскому языку для подготовки к ОГЭ",
+    "timeLimit": 180,
+    "isPublished": true,
+    "tasks": [
+      {
+        "questionText": "В каком слове пишется буква И?",
+        "taskType": "multiple_choice",
+        "correctAnswer": "прИвет",
+        "explanation": "В слове 'привет' пишется буква И, так как приставка 'при-' пишется перед согласными. Приставка 'пре-' пишется в словах с значением 'очень' или 'пере-'.",
+        "answerOptions": [
+          {
+            "text": "прЕвет",
+            "isCorrect": false
+          },
+          {
+            "text": "прИвет",
+            "isCorrect": true
+          },
+          {
+            "text": "прЯвет",
+            "isCorrect": false
+          },
+          {
+            "text": "прОвет",
+            "isCorrect": false
+          }
+        ],
+        "difficultyLevel": 2,
+        "points": 1
+      },
+      {
+        "questionText": "В каком слове пишется одна буква Н?",
+        "taskType": "multiple_choice",
+        "correctAnswer": "деревяННый",
+        "explanation": "В слове 'деревянный' пишется две буквы Н, так как это прилагательное, образованное от существительного с помощью суффикса -янн-. Одна Н пишется в прилагательных с суффиксами -ан-, -ян- (кроме исключений).",
+        "answerOptions": [
+          {
+            "text": "деревяННый",
+            "isCorrect": false
+          },
+          {
+            "text": "оловяНый",
+            "isCorrect": true
+          },
+          {
+            "text": "стекляННый",
+            "isCorrect": false
+          },
+          {
+            "text": "оловяННый",
+            "isCorrect": false
+          }
+        ],
+        "difficultyLevel": 3,
+        "points": 1
+      },
+      {
+        "questionText": "Укажите предложение с грамматической ошибкой.",
+        "taskType": "multiple_choice",
+        "correctAnswer": "Благодаря хорошей погоде мы пошли гулять.",
+        "explanation": "Предлог 'благодаря' требует дательного падежа. Правильно: 'благодаря хорошей погоде' (дательный падеж). Ошибка в варианте 'благодаря хорошей погоде мы пошли гулять' - здесь всё правильно, но нужно проверить другие варианты.",
+        "answerOptions": [
+          {
+            "text": "Благодаря хорошей погоде мы пошли гулять.",
+            "isCorrect": false
+          },
+          {
+            "text": "По приезде в город мы сразу отправились в музей.",
+            "isCorrect": false
+          },
+          {
+            "text": "Согласно приказу директора занятия отменены.",
+            "isCorrect": false
+          },
+          {
+            "text": "Все варианты правильные",
+            "isCorrect": true
+          }
+        ],
+        "difficultyLevel": 3,
+        "points": 1
+      },
+      {
+        "questionText": "В каком слове ударение падает на первый слог?",
+        "taskType": "multiple_choice",
+        "correctAnswer": "звОнит",
+        "explanation": "В слове 'звонит' ударение падает на второй слог (звонИт), а не на первый. Правильный ответ нужно выбрать из вариантов, где ударение действительно на первом слоге.",
+        "answerOptions": [
+          {
+            "text": "звОнит",
+            "isCorrect": false
+          },
+          {
+            "text": "тОрты",
+            "isCorrect": true
+          },
+          {
+            "text": "катАлог",
+            "isCorrect": false
+          },
+          {
+            "text": "красИвее",
+            "isCorrect": false
+          }
+        ],
+        "difficultyLevel": 2,
+        "points": 1
+      }
+    ]
+  }
+]
+

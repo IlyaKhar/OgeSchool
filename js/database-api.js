@@ -16,12 +16,20 @@ class DatabaseAPI {
         const url = `${this.baseURL}${endpoint}`;
         
         try {
+            const headers = {
+                'Content-Type': 'application/json',
+                ...options.headers
+            };
+
+            // Если есть глобальный apiClient с токеном, добавляем Authorization,
+            // чтобы backend мог аутентифицировать пользователя для защищённых маршрутов
+            if (window.apiClient && window.apiClient.accessToken) {
+                headers.Authorization = `Bearer ${window.apiClient.accessToken}`;
+            }
+
             const response = await fetch(url, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...options.headers
-                },
-                ...options
+                ...options,
+                headers
             });
             
             if (!response.ok) {

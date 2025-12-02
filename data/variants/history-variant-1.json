@@ -1,0 +1,92 @@
+[
+  {
+    "name": "Вариант 1 - История ОГЭ",
+    "subject": "История",
+    "subjectCode": "history",
+    "topic": "История России",
+    "description": "Первый вариант по истории для подготовки к ОГЭ",
+    "timeLimit": 180,
+    "isPublished": true,
+    "tasks": [
+      {
+        "questionText": "В каком году произошла Куликовская битва?",
+        "taskType": "multiple_choice",
+        "correctAnswer": "1380",
+        "explanation": "Куликовская битва произошла 8 сентября 1380 года. Это сражение между русскими войсками под предводительством Дмитрия Донского и войсками Золотой Орды под командованием Мамая. Битва закончилась победой русских войск.",
+        "answerOptions": [
+          {
+            "text": "1240",
+            "isCorrect": false
+          },
+          {
+            "text": "1380",
+            "isCorrect": true
+          },
+          {
+            "text": "1480",
+            "isCorrect": false
+          },
+          {
+            "text": "1612",
+            "isCorrect": false
+          }
+        ],
+        "difficultyLevel": 2,
+        "points": 1
+      },
+      {
+        "questionText": "Кто был первым императором России?",
+        "taskType": "multiple_choice",
+        "correctAnswer": "Петр I",
+        "explanation": "Петр I (Петр Великий) был провозглашен императором России в 1721 году после победы в Северной войне. До этого правители России носили титул царя.",
+        "answerOptions": [
+          {
+            "text": "Иван IV",
+            "isCorrect": false
+          },
+          {
+            "text": "Петр I",
+            "isCorrect": true
+          },
+          {
+            "text": "Екатерина II",
+            "isCorrect": false
+          },
+          {
+            "text": "Александр I",
+            "isCorrect": false
+          }
+        ],
+        "difficultyLevel": 2,
+        "points": 1
+      },
+      {
+        "questionText": "В каком году началась Первая мировая война?",
+        "taskType": "multiple_choice",
+        "correctAnswer": "1914",
+        "explanation": "Первая мировая война началась 28 июля 1914 года после убийства эрцгерцога Франца Фердинанда в Сараево. Россия вступила в войну 1 августа 1914 года.",
+        "answerOptions": [
+          {
+            "text": "1912",
+            "isCorrect": false
+          },
+          {
+            "text": "1914",
+            "isCorrect": true
+          },
+          {
+            "text": "1916",
+            "isCorrect": false
+          },
+          {
+            "text": "1918",
+            "isCorrect": false
+          }
+        ],
+        "difficultyLevel": 2,
+        "points": 1
+      }
+    ]
+  }
+]
+

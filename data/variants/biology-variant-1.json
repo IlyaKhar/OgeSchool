@@ -1,0 +1,118 @@
+[
+  {
+    "name": "Вариант 1 - Биология ОГЭ",
+    "subject": "Биология",
+    "subjectCode": "biology",
+    "topic": "Общая биология",
+    "description": "Первый вариант по биологии для подготовки к ОГЭ",
+    "timeLimit": 180,
+    "isPublished": true,
+    "tasks": [
+      {
+        "questionText": "Какая органелла отвечает за синтез белка в клетке?",
+        "taskType": "multiple_choice",
+        "correctAnswer": "Рибосома",
+        "explanation": "Рибосомы - это органеллы, на которых происходит синтез белка. Митохондрии отвечают за энергетический обмен, ядро содержит генетический материал, хлоропласты - за фотосинтез в растительных клетках.",
+        "answerOptions": [
+          {
+            "text": "Митохондрия",
+            "isCorrect": false
+          },
+          {
+            "text": "Рибосома",
+            "isCorrect": true
+          },
+          {
+            "text": "Ядро",
+            "isCorrect": false
+          },
+          {
+            "text": "Хлоропласт",
+            "isCorrect": false
+          }
+        ],
+        "difficultyLevel": 2,
+        "points": 1
+      },
+      {
+        "questionText": "Сколько хромосом в соматической клетке человека?",
+        "taskType": "multiple_choice",
+        "correctAnswer": "46",
+        "explanation": "В соматических (неполовых) клетках человека содержится 46 хромосом (23 пары). В половых клетках (гаметах) - 23 хромосомы. 44 и 48 - неправильные числа для человека.",
+        "answerOptions": [
+          {
+            "text": "23",
+            "isCorrect": false
+          },
+          {
+            "text": "44",
+            "isCorrect": false
+          },
+          {
+            "text": "46",
+            "isCorrect": true
+          },
+          {
+            "text": "48",
+            "isCorrect": false
+          }
+        ],
+        "difficultyLevel": 2,
+        "points": 1
+      },
+      {
+        "questionText": "Какой процесс обеспечивает поступление кислорода в организм человека?",
+        "taskType": "multiple_choice",
+        "correctAnswer": "Дыхание",
+        "explanation": "Дыхание - это процесс, при котором кислород поступает в организм через легкие, а углекислый газ выводится. Фотосинтез происходит в растениях, пищеварение - переработка пищи, кровообращение - транспорт веществ.",
+        "answerOptions": [
+          {
+            "text": "Фотосинтез",
+            "isCorrect": false
+          },
+          {
+            "text": "Дыхание",
+            "isCorrect": true
+          },
+          {
+            "text": "Пищеварение",
+            "isCorrect": false
+          },
+          {
+            "text": "Кровообращение",
+            "isCorrect": false
+          }
+        ],
+        "difficultyLevel": 2,
+        "points": 1
+      },
+      {
+        "questionText": "Какая система органов отвечает за переваривание пищи?",
+        "taskType": "multiple_choice",
+        "correctAnswer": "Пищеварительная",
+        "explanation": "Пищеварительная система отвечает за переваривание и всасывание питательных веществ. Дыхательная - за газообмен, кровеносная - за транспорт веществ, нервная - за координацию функций организма.",
+        "answerOptions": [
+          {
+            "text": "Дыхательная",
+            "isCorrect": false
+          },
+          {
+            "text": "Кровеносная",
+            "isCorrect": false
+          },
+          {
+            "text": "Пищеварительная",
+            "isCorrect": true
+          },
+          {
+            "text": "Нервная",
+            "isCorrect": false
+          }
+        ],
+        "difficultyLevel": 2,
+        "points": 1
+      }
+    ]
+  }
+]
+

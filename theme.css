@@ -3,8 +3,42 @@
   --primary:#155EEF;--border:#e5e7eb;
   --shadow:0 6px 24px rgba(15,23,42,.06),0 2px 8px rgba(15,23,42,.04)
 }
-.dark{
+
+/* Светлая тема (по умолчанию) */
+.light,
+:root:not(.dark) {
+  --bg:#ffffff;--bg-muted:#f6f8fa;--text:#0b1220;--text-muted:#5b6877;
+  --primary:#155EEF;--border:#e5e7eb;
+  --shadow:0 6px 24px rgba(15,23,42,.06),0 2px 8px rgba(15,23,42,.04);
+  --bg-alt:#f8fafc;
+}
+
+/* Темная тема */
+.dark {
   --bg:#0b1220;--bg-muted:#0f172a;--text:#e2e8f0;--text-muted:#94a3b8;
   --primary:#60a5fa;--border:#1f2937;
-  --shadow:0 6px 24px rgba(0,0,0,.35),0 2px 8px rgba(0,0,0,.25)
+  --shadow:0 6px 24px rgba(0,0,0,.35),0 2px 8px rgba(0,0,0,.25);
+  --bg-alt:#1e293b;
+}
+
+/* Обновление фона body для темной темы */
+.dark body {
+  background:
+    radial-gradient(900px 300px at 50% -140px, rgba(96,165,250,.08), transparent 60%),
+    linear-gradient(180deg, #0b1220 0%, #0f172a 100%);
+}
+
+.dark body::before {
+  background:
+    conic-gradient(from 210deg at 10% 12%, rgba(99,102,241,.15), rgba(56,189,248,.08), transparent 70%),
+    conic-gradient(from -20deg at 90% 10%, rgba(59,130,246,.12), rgba(96,165,250,.08), transparent 72%),
+    conic-gradient(from 180deg at 50% 96%, rgba(96,165,250,.12), rgba(56,189,248,.08), transparent 80%),
+    radial-gradient(600px 320px at 8% 18%, rgba(96,165,250,.08), transparent 60%),
+    radial-gradient(520px 280px at 92% 14%, rgba(59,130,246,.08), transparent 60%),
+    radial-gradient(640px 340px at 85% 88%, rgba(59,130,246,.06), transparent 60%),
+    radial-gradient(560px 320px at 0% 100%, rgba(56,189,248,.06), transparent 60%);
+}
+
+.dark body::after {
+  background-image: radial-gradient(rgba(255,255,255,.03) 1px, transparent 1px);
 }

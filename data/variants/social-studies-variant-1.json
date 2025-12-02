@@ -1,0 +1,92 @@
+[
+  {
+    "name": "Вариант 1 - Обществознание ОГЭ",
+    "subject": "Обществознание",
+    "subjectCode": "social-studies",
+    "topic": "Право и политика",
+    "description": "Первый вариант по обществознанию для подготовки к ОГЭ",
+    "timeLimit": 180,
+    "isPublished": true,
+    "tasks": [
+      {
+        "questionText": "Какой орган власти является высшим законодательным органом в России?",
+        "taskType": "multiple_choice",
+        "correctAnswer": "Федеральное Собрание",
+        "explanation": "Федеральное Собрание - это парламент Российской Федерации, состоящий из двух палат: Государственной Думы и Совета Федерации. Это высший законодательный орган страны.",
+        "answerOptions": [
+          {
+            "text": "Правительство",
+            "isCorrect": false
+          },
+          {
+            "text": "Федеральное Собрание",
+            "isCorrect": true
+          },
+          {
+            "text": "Верховный Суд",
+            "isCorrect": false
+          },
+          {
+            "text": "Президент",
+            "isCorrect": false
+          }
+        ],
+        "difficultyLevel": 2,
+        "points": 1
+      },
+      {
+        "questionText": "С какого возраста наступает полная дееспособность в России?",
+        "taskType": "multiple_choice",
+        "correctAnswer": "18",
+        "explanation": "Полная дееспособность в России наступает с 18 лет. С этого возраста человек может самостоятельно совершать все сделки и нести полную ответственность за свои действия.",
+        "answerOptions": [
+          {
+            "text": "16",
+            "isCorrect": false
+          },
+          {
+            "text": "18",
+            "isCorrect": true
+          },
+          {
+            "text": "21",
+            "isCorrect": false
+          },
+          {
+            "text": "14",
+            "isCorrect": false
+          }
+        ],
+        "difficultyLevel": 2,
+        "points": 1
+      },
+      {
+        "questionText": "Что является основным законом Российской Федерации?",
+        "taskType": "multiple_choice",
+        "correctAnswer": "Конституция",
+        "explanation": "Конституция Российской Федерации - это основной закон страны, который имеет высшую юридическую силу. Все остальные законы должны соответствовать Конституции.",
+        "answerOptions": [
+          {
+            "text": "Гражданский кодекс",
+            "isCorrect": false
+          },
+          {
+            "text": "Конституция",
+            "isCorrect": true
+          },
+          {
+            "text": "Уголовный кодекс",
+            "isCorrect": false
+          },
+          {
+            "text": "Трудовой кодекс",
+            "isCorrect": false
+          }
+        ],
+        "difficultyLevel": 1,
+        "points": 1
+      }
+    ]
+  }
+]
+

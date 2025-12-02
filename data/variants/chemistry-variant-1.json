@@ -1,0 +1,104 @@
+[
+  {
+    "name": "Вариант 1 - Химия ОГЭ",
+    "subject": "Химия",
+    "subjectCode": "chemistry",
+    "topic": "Неорганическая химия",
+    "description": "Первый вариант по химии для подготовки к ОГЭ",
+    "timeLimit": 180,
+    "isPublished": true,
+    "tasks": [
+      {
+        "questionText": "Какая формула соответствует оксиду углерода(IV)?",
+        "taskType": "multiple_choice",
+        "correctAnswer": "CO₂",
+        "explanation": "Оксид углерода(IV) - это углекислый газ, его формула CO₂. Римская цифра IV означает степень окисления углерода +4. CO - это оксид углерода(II), C₂O - не существует, CO₃ - это карбонат-ион.",
+        "answerOptions": [
+          {
+            "text": "CO",
+            "isCorrect": false
+          },
+          {
+            "text": "CO₂",
+            "isCorrect": true
+          },
+          {
+            "text": "C₂O",
+            "isCorrect": false
+          },
+          {
+            "text": "CO₃",
+            "isCorrect": false
+          }
+        ],
+        "difficultyLevel": 2,
+        "points": 1
+      },
+      {
+        "questionText": "Какой газ выделяется при взаимодействии цинка с соляной кислотой?",
+        "taskType": "multiple_choice",
+        "correctAnswer": "Водород",
+        "explanation": "При взаимодействии цинка с соляной кислотой происходит реакция: Zn + 2HCl → ZnCl₂ + H₂. Выделяется водород. Кислород выделяется при разложении некоторых оксидов, углекислый газ - при взаимодействии карбонатов с кислотами, хлор - при окислении соляной кислоты.",
+        "answerOptions": [
+          {
+            "text": "Кислород",
+            "isCorrect": false
+          },
+          {
+            "text": "Водород",
+            "isCorrect": true
+          },
+          {
+            "text": "Углекислый газ",
+            "isCorrect": false
+          },
+          {
+            "text": "Хлор",
+            "isCorrect": false
+          }
+        ],
+        "difficultyLevel": 2,
+        "points": 1
+      },
+      {
+        "questionText": "Вычислите массу 2 моль воды (H₂O).",
+        "taskType": "short_answer",
+        "correctAnswer": "36",
+        "explanation": "Молярная масса воды H₂O = 2×1 + 16 = 18 г/моль. Масса 2 моль воды = 2 × 18 = 36 г.",
+        "solutionSteps": [
+          "Молярная масса H₂O: M = 2×1 + 16 = 18 г/моль",
+          "Масса 2 моль: m = n × M = 2 × 18 = 36 г"
+        ],
+        "difficultyLevel": 2,
+        "points": 1
+      },
+      {
+        "questionText": "Какое вещество является основанием?",
+        "taskType": "multiple_choice",
+        "correctAnswer": "NaOH",
+        "explanation": "NaOH (гидроксид натрия) - это основание, так как при диссоциации образует ионы OH⁻. H₂SO₄ - кислота, NaCl - соль, SO₂ - оксид.",
+        "answerOptions": [
+          {
+            "text": "H₂SO₄",
+            "isCorrect": false
+          },
+          {
+            "text": "NaOH",
+            "isCorrect": true
+          },
+          {
+            "text": "NaCl",
+            "isCorrect": false
+          },
+          {
+            "text": "SO₂",
+            "isCorrect": false
+          }
+        ],
+        "difficultyLevel": 2,
+        "points": 1
+      }
+    ]
+  }
+]
+

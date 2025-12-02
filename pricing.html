@@ -3,197 +3,16 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Тарифы — OGE Platform</title>
+  <title>Тарифы подготовки к ОГЭ 9 класса — OGE Platform</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="theme.css">
+  <script src="js/theme.js"></script>
   <link rel="stylesheet" href="global.css">
   <link rel="stylesheet" href="components.css">
   <link rel="stylesheet" href="auth.css">
-  <style>
-    .pricing-hero {
-      text-align: center;
-      padding: 80px 0 60px;
-    }
-    
-    .pricing-hero h1 {
-      font-size: 48px;
-      margin-bottom: 16px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    
-    .pricing-hero p {
-      font-size: 20px;
-      color: var(--text-muted);
-      max-width: 600px;
-      margin: 0 auto 40px;
-    }
-    
-    .pricing-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 32px;
-      margin: 60px 0;
-    }
-    
-    .pricing-card {
-      background: linear-gradient(165deg, #ffffff, #f8f9fe);
-      border: 2px solid var(--border);
-      border-radius: 20px;
-      padding: 40px 32px;
-      text-align: center;
-      position: relative;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    }
-    
-    .pricing-card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-      border-color: var(--primary);
-    }
-    
-    .pricing-card.featured {
-      border-color: var(--primary);
-      background: linear-gradient(165deg, #ffffff, #f0f4ff);
-      transform: scale(1.05);
-    }
-    
-    .pricing-card.featured::before {
-      content: "🔥 ПОПУЛЯРНЫЙ";
-      position: absolute;
-      top: -12px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-      color: white;
-      padding: 8px 20px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-    }
-    
-    .plan-name {
-      font-size: 24px;
-      font-weight: 800;
-      margin-bottom: 8px;
-      color: var(--text);
-    }
-    
-    .plan-subtitle {
-      font-size: 14px;
-      color: var(--text-muted);
-      margin-bottom: 24px;
-      font-style: italic;
-    }
-    
-    .price {
-      font-size: 48px;
-      font-weight: 800;
-      color: var(--primary);
-      margin-bottom: 8px;
-      font-family: Manrope, sans-serif;
-    }
-    
-    .price-period {
-      font-size: 16px;
-      color: var(--text-muted);
-      margin-bottom: 32px;
-    }
-    
-    .features {
-      list-style: none;
-      padding: 0;
-      margin: 0 0 32px;
-      text-align: left;
-    }
-    
-    .features li {
-      padding: 8px 0;
-      color: var(--text);
-      position: relative;
-      padding-left: 28px;
-    }
-    
-    .features li::before {
-      content: "✓";
-      position: absolute;
-      left: 0;
-      color: #10b981;
-      font-weight: bold;
-      font-size: 16px;
-    }
-    
-    .buy-btn {
-      width: 100%;
-      padding: 16px 24px;
-      font-size: 16px;
-      font-weight: 700;
-      border-radius: 12px;
-      border: none;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-decoration: none;
-      display: inline-block;
-      text-align: center;
-    }
-    
-    .buy-btn.primary {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-    }
-    
-    .buy-btn.primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-    }
-    
-    .buy-btn.secondary {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-      color: white;
-    }
-    
-    .buy-btn.secondary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(245, 87, 108, 0.4);
-    }
-    
-    .buy-btn.tertiary {
-      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-      color: white;
-    }
-    
-    .buy-btn.tertiary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(79, 172, 254, 0.4);
-    }
-    
-    .emoji {
-      font-size: 32px;
-      margin-bottom: 16px;
-      display: block;
-    }
-    
-    @media (max-width: 768px) {
-      .pricing-grid {
-        grid-template-columns: 1fr;
-        gap: 24px;
-      }
-      
-      .pricing-card.featured {
-        transform: none;
-      }
-      
-      .pricing-hero h1 {
-        font-size: 36px;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="css/pricing.css">
 </head>
 <body>
   <header class="site-header site-header-dark">
@@ -217,8 +36,8 @@
   <main>
     <section class="pricing-hero">
       <div class="container">
-        <h1>Выбери свой путь к успеху</h1>
-        <p>От пробного полёта до уверенной посадки на 5 баллов — у нас есть тариф для каждого этапа подготовки</p>
+        <h1>Тарифы подготовки к ОГЭ 9 класса</h1>
+        <p>От первых пробных заданий до стабильной 4–5 на реальном экзамене — выбери формат, который подходит именно тебе</p>
       </div>
     </section>
 
@@ -227,18 +46,17 @@
         <div class="pricing-grid">
           <!-- Первый тариф -->
           <div class="pricing-card">
-            <span class="emoji">🚀</span>
-            <div class="plan-name">ПОЛЁТ НА МАКСИМУМ</div>
-            <div class="plan-subtitle">Для тех, кто хочет попробовать всё и сразу</div>
+            <span class="emoji"></span>
+          <div class="plan-name">СТАРТ К ОГЭ</div>
+            <div class="plan-subtitle">Для тех, кто только начинает подготовку в 9 классе</div>
             <div class="price">600 ₽ </div>
             <div class="price-period">в месяц</div>
             <ul class="features">
-              <li>Доступ ко всем предметам</li>
-              <li>Неограниченное количество заданий</li>
-              <li>Персональная статистика</li>
-              <li>Подробные объяснения</li>
-              <li>Мобильное приложение</li>
-              <li>Поддержка 24/7</li>
+              <li>Доступ к русскому и математике (ОГЭ)</li>
+              <li>Тренажёры по номерам заданий ОГЭ</li>
+              <li>Базовая статистика прогресса</li>
+              <li>Объяснения решений в формате ОГЭ</li>
+              <li>Доступ к пробным вариантам</li>
             </ul>
             <a href="#buy" class="buy-btn primary">КУПИТЬ СЕЙЧАС</a>
           </div>
@@ -264,7 +82,7 @@
 
           <!-- Третий тариф -->
           <div class="pricing-card">
-            <span class="emoji">🎯</span>
+            <span class="emoji"></span>
             <div class="plan-name">ПЯТЁРКА ГАРАНТИРОВАНА</div>
             <div class="plan-subtitle">Для тех, кто не ищет лёгких путей</div>
             <div class="price">500 ₽</div>
@@ -406,7 +224,9 @@
     </div>
   </div>
 
+  <script src="js/api-client.js"></script>
   <script src="main.js"></script>
   <script src="auth.js"></script>
+  <script src="js/pricing.js"></script>
 </body>
 </html>
