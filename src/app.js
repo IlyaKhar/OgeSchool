@@ -22,7 +22,9 @@ connectDB().catch(console.error);
 // Middleware
 // Базовая защита HTTP-заголовков
 app.use(helmet({
-  crossOriginResourcePolicy: { policy: 'cross-origin' }
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+  contentSecurityPolicy: false, // Отключаем CSP для статических файлов
+  crossOriginEmbedderPolicy: false
 }));
 
 // CORS: для продакшена сюда можно поставить домен вместо true
@@ -57,16 +59,48 @@ const aiLimiter = rateLimit({
 // Определяем путь к статическим файлам (на Vercel это корень проекта)
 const staticPath = path.join(__dirname, '..');
 
-// Статика (фронтенд лежит в корне проекта)
-// express.static обрабатывает все статические файлы: CSS, JS, изображения и т.д.
-app.use(express.static(staticPath));
+// Обработка статических файлов с правильными MIME типами
+// CSS файлы
+app.get('*.css', (req, res) => {
+  const filePath = path.join(staticPath, req.path);
+  res.type('text/css');
+  res.sendFile(filePath, (err) => {
+    if (err) {
+      console.error('CSS not found:', req.path);
+      res.status(404).send('/* CSS file not found */');
+    }
+  });
+});
+
+// JS файлы
+app.get('*.js', (req, res) => {
+  const filePath = path.join(staticPath, req.path);
+  res.type('application/javascript');
+  res.sendFile(filePath, (err) => {
+    if (err) {
+      console.error('JS not found:', req.path);
+      res.status(404).send('// JS file not found');
+    }
+  });
+});
+
+// Статика для остальных файлов (изображения, шрифты и т.д.)
+app.use(express.static(staticPath, {
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.css')) {
+      res.type('text/css');
+    } else if (filePath.endsWith('.js')) {
+      res.type('application/javascript');
+    }
+  }
+}));
 
 // Обработка корневого пути
 app.get('/', (req, res) => {
   res.sendFile(path.join(staticPath, 'index.html'));
 });
 
-// Обработка HTML страниц (должно быть после express.static, но до API роутов)
+// Обработка HTML страниц
 app.get('*.html', (req, res) => {
   const filePath = path.join(staticPath, req.path);
   res.sendFile(filePath, (err) => {
