@@ -136,7 +136,6 @@ class DatabaseManager {
             .filter(s => s.length > 0 && !s.startsWith('--') && !s.toLowerCase().includes('index'));
         
         let created = 0;
-        let created = 0;
         for (const statement of statements) {
             if (!statement) continue;
             try {
