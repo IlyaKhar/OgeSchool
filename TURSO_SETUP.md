@@ -32,12 +32,14 @@ Turso - это serverless SQLite, который работает на Vercel и
 3. Добавьте две переменные:
 
    **Key**: `TURSO_DATABASE_URL`  
-   **Value**: `libsql://ваш-url-от-turso`
+   **Value**: `libsql://oge-platform-ilyakhar.aws-ap-northeast-1.turso.io`
 
    **Key**: `TURSO_AUTH_TOKEN`  
-   **Value**: `ваш-токен-от-turso`
+   **Value**: `eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3NjQ3MDM0MzcsImlkIjoiMzNmYjkyNDAtZmVmNy00OWI4LTkyNjUtNDdmODUwYzU4ZWJiIiwicmlkIjoiY2E0MjQ2ZjItMzM2My00NjMyLThjYzItODg5MmM1MTUyZjI3In0.Wu9kZbKPG5fu8tWuMgxcfgDZKUIItLRGLs7oG1KU1wgunTG4s1hL1Sy2TE9gMgYkIuxOvMnVWMSD6k2zmd9-CA`
 
 4. Сохраните и передеплойте проект
+
+**Важно**: Скопируйте значения точно, без пробелов в начале или конце!
 
 ## Шаг 5: Инициализация таблиц
 
