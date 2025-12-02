@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Админ‑панель OGE Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="global.css">
+  <link rel="stylesheet" href="components.css">
+  <link rel="stylesheet" href="auth.css">
+  <style>
+    .admin-root{
+      max-width:1400px;
+      margin:0 auto;
+      padding:32px 16px 40px;
+    }
+    .admin-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:16px;
+      margin-bottom:24px;
+    }
+    .admin-title{
+      font-size:26px;
+      font-weight:800;
+    }
+    .admin-subtitle{
+      margin-top:4px;
+      color:#6b7280;
+      font-size:14px;
+    }
+    .admin-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 10px;
+      border-radius:999px;
+      background:#ecfdf5;
+      color:#047857;
+      font-size:12px;
+      font-weight:600;
+    }
+    .admin-layout{
+      display:grid;
+      grid-template-columns:220px minmax(0,1fr);
+      gap:20px;
+      align-items:flex-start;
+    }
+    @media (max-width: 900px) {
+      .admin-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+    .admin-nav{
+      border-radius:18px;
+      background:linear-gradient(180deg,#020617,#020617);
+      color:#e5e7eb;
+      padding:14px 14px 16px;
+      box-shadow:0 18px 60px rgba(15,23,42,.7);
+      position:sticky;
+      top:20px;
+    }
+    .admin-nav-title{
+      font-size:13px;
+      font-weight:600;
+      color:#9ca3af;
+      margin-bottom:8px;
+    }
+    .admin-nav a{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 10px;
+      border-radius:10px;
+      color:#e5e7eb;
+      text-decoration:none;
+      font-size:14px;
+      cursor:pointer;
+    }
+    .admin-nav a:hover{
+      background:rgba(15,23,42,.55);
+    }
+    .admin-nav a.active{
+      background:linear-gradient(135deg,#155EEF,#3B82F6);
+      color:#ffffff;
+    }
+    .admin-card{
+      border-radius:20px;
+      background:linear-gradient(180deg,#ffffff,#f8faff);
+      box-shadow:0 18px 60px rgba(15,23,42,.14);
+      border:1px solid rgba(15,23,42,.06);
+      padding:18px 20px 20px;
+    }
+    .admin-card-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-bottom:16px;
+    }
+    .admin-card-title{
+      font-size:18px;
+      font-weight:700;
+    }
+    .admin-btn{
+      padding:8px 16px;
+      border-radius:10px;
+      border:none;
+      font-size:14px;
+      font-weight:600;
+      cursor:pointer;
+      transition:all 0.2s;
+    }
+    .admin-btn-primary{
+      background:linear-gradient(135deg,#155EEF,#3B82F6);
+      color:#ffffff;
+    }
+    .admin-btn-primary:hover{
+      transform:translateY(-1px);
+      box-shadow:0 4px 12px rgba(21,94,239,.3);
+    }
+    .admin-btn-danger{
+      background:#ef4444;
+      color:#ffffff;
+    }
+    .admin-btn-danger:hover{
+      background:#dc2626;
+    }
+    .admin-btn-ghost{
+      background:transparent;
+      color:#6b7280;
+      border:1px solid #e5e7eb;
+    }
+    .admin-btn-ghost:hover{
+      background:#f9fafb;
+    }
+    .admin-filters{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:16px;
+    }
+    .admin-select{
+      padding:8px 12px;
+      border-radius:10px;
+      border:1px solid #e5e7eb;
+      background:#ffffff;
+      font-size:14px;
+      min-width:180px;
+    }
+    .admin-table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:12px;
+    }
+    .admin-table th{
+      text-align:left;
+      padding:12px;
+      font-size:13px;
+      font-weight:600;
+      color:#6b7280;
+      border-bottom:2px solid #e5e7eb;
+    }
+    .admin-table td{
+      padding:12px;
+      border-bottom:1px solid #f3f4f6;
+      font-size:14px;
+    }
+    .admin-table tr:hover{
+      background:#f9fafb;
+    }
+    .admin-actions{
+      display:flex;
+      gap:8px;
+    }
+    .admin-modal{
+      display:none;
+      position:fixed;
+      top:0;
+      left:0;
+      right:0;
+      bottom:0;
+      background:rgba(0,0,0,.5);
+      z-index:1000;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+    }
+    .admin-modal.show{
+      display:flex;
+    }
+    .admin-modal-content{
+      background:#ffffff;
+      border-radius:20px;
+      padding:24px;
+      max-width:600px;
+      width:100%;
+      max-height:90vh;
+      overflow-y:auto;
+    }
+    .admin-modal-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:20px;
+    }
+    .admin-modal-title{
+      font-size:20px;
+      font-weight:700;
+    }
+    .admin-modal-close{
+      background:none;
+      border:none;
+      font-size:24px;
+      cursor:pointer;
+      color:#6b7280;
+    }
+    .admin-form-group{
+      margin-bottom:16px;
+    }
+    .admin-form-label{
+      display:block;
+      font-size:14px;
+      font-weight:600;
+      margin-bottom:6px;
+      color:#111827;
+    }
+    .admin-form-input,
+    .admin-form-textarea,
+    .admin-form-select{
+      width:100%;
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid #e5e7eb;
+      font-size:14px;
+      font-family:inherit;
+    }
+    .admin-form-textarea{
+      min-height:100px;
+      resize:vertical;
+    }
+    .admin-form-actions{
+      display:flex;
+      gap:12px;
+      justify-content:flex-end;
+      margin-top:24px;
+    }
+    .admin-alert{
+      border-radius:12px;
+      padding:12px 16px;
+      font-size:14px;
+      margin-bottom:16px;
+    }
+    .admin-alert-error{
+      background:#fef2f2;
+      color:#b91c1c;
+      border:1px solid #fecaca;
+    }
+    .admin-alert-success{
+      background:#f0fdf4;
+      color:#166534;
+      border:1px solid #bbf7d0;
+    }
+    .admin-loading{
+      text-align:center;
+      padding:40px;
+      color:#6b7280;
+    }
+    .answer-options-list{
+      margin-top:12px;
+    }
+    .answer-option-item{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      margin-bottom:8px;
+      padding:8px;
+      background:#f9fafb;
+      border-radius:8px;
+    }
+    .answer-option-item input[type="text"]{
+      flex:1;
+      padding:6px 10px;
+      border-radius:6px;
+      border:1px solid #e5e7eb;
+      font-size:14px;
+    }
+    .answer-option-item input[type="checkbox"]{
+      width:18px;
+      height:18px;
+    }
+    .answer-option-item button{
+      padding:6px 12px;
+      background:#ef4444;
+      color:#ffffff;
+      border:none;
+      border-radius:6px;
+      cursor:pointer;
+      font-size:12px;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header site-header-dark">
+    <div class="container nav">
+      <div class="logo">OGE</div>
+      <div class="nav-center">
+        <nav class="menu nav-pill">
+          <a href="index.html">Главная</a>
+          <a href="about.html">О нас</a>
+          <a href="pricing.html">Тарифы</a>
+          <a href="tasks.html">Карта заданий</a>
+          <a href="tasks-database.html">База заданий</a>
+          <a href="exams.html">Экзамены</a>
+        </nav>
+      </div>
+      <div class="actions" id="authActions">
+        <a href="#login" class="btn btn-ghost">Войти</a>
+        <a href="#signup" class="btn btn-primary">Попробовать</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="admin-root">
+      <div class="admin-header">
+        <div>
+          <div class="admin-badge">Только для администратора</div>
+          <h1 class="admin-title">Админ‑панель OGE Platform</h1>
+          <p class="admin-subtitle">Управление задачами, темами и вариантами ОГЭ. Доступно только аккаунту администратора.</p>
+        </div>
+      </div>
+
+      <section class="admin-layout">
+        <aside class="admin-nav">
+          <div class="admin-nav-title">Разделы админки</div>
+          <a href="#" data-section="tasks" class="active">Задачи и темы</a>
+          <a href="#" data-section="variants">Варианты ОГЭ</a>
+          <a href="#" data-section="users">Пользователи</a>
+        </aside>
+
+        <section class="admin-card" id="adminContent">
+          <div id="adminStatus" class="admin-loading">
+            Проверяем права доступа...
+          </div>
+        </section>
+      </section>
+    </div>
+  </main>
+
+  <!-- Модальное окно для создания/редактирования задачи -->
+  <div id="taskModal" class="admin-modal">
+    <div class="admin-modal-content">
+      <div class="admin-modal-header">
+        <h2 class="admin-modal-title" id="taskModalTitle">Создать задачу</h2>
+        <button class="admin-modal-close" data-modal="taskModal">×</button>
+      </div>
+      <form id="taskForm">
+        <input type="hidden" id="taskId" name="id">
+        <div class="admin-form-group">
+          <label class="admin-form-label">Предмет *</label>
+          <select class="admin-form-select" id="taskSubjectId" name="subjectId" required>
+            <option value="">Выберите предмет</option>
+          </select>
+        </div>
+        <div class="admin-form-group">
+          <label class="admin-form-label">Тема</label>
+          <select class="admin-form-select" id="taskTopicId" name="topicId">
+            <option value="">Без темы</option>
+          </select>
+        </div>
+        <div class="admin-form-group">
+          <label class="admin-form-label">Тип задачи *</label>
+          <select class="admin-form-select" id="taskType" name="taskType" required>
+            <option value="multiple_choice">Множественный выбор</option>
+            <option value="short_answer">Краткий ответ</option>
+            <option value="detailed_answer">Развёрнутый ответ</option>
+            <option value="matching">Соответствие</option>
+            <option value="ordering">Упорядочивание</option>
+          </select>
+        </div>
+        <div class="admin-form-group">
+          <label class="admin-form-label">Сложность (1-5) *</label>
+          <input type="number" class="admin-form-input" id="taskDifficulty" name="difficultyLevel" min="1" max="5" value="1" required>
+        </div>
+        <div class="admin-form-group">
+          <label class="admin-form-label">Баллы *</label>
+          <input type="number" class="admin-form-input" id="taskPoints" name="points" min="1" value="1" required>
+        </div>
+        <div class="admin-form-group">
+          <label class="admin-form-label">Текст вопроса *</label>
+          <textarea class="admin-form-textarea" id="taskQuestionText" name="questionText" required></textarea>
+        </div>
+        <div class="admin-form-group">
+          <label class="admin-form-label">Правильный ответ *</label>
+          <input type="text" class="admin-form-input" id="taskCorrectAnswer" name="correctAnswer" required>
+        </div>
+        <div class="admin-form-group">
+          <label class="admin-form-label">Объяснение</label>
+          <textarea class="admin-form-textarea" id="taskExplanation" name="explanation"></textarea>
+        </div>
+        <div id="answerOptionsContainer" class="admin-form-group" style="display:none;">
+          <label class="admin-form-label">Варианты ответов</label>
+          <div class="answer-options-list" id="answerOptionsList"></div>
+          <button type="button" class="admin-btn admin-btn-ghost" id="addAnswerOptionBtn" style="margin-top:8px;">+ Добавить вариант</button>
+        </div>
+        <div class="admin-form-actions">
+          <button type="button" class="admin-btn admin-btn-ghost" data-modal="taskModal">Отмена</button>
+          <button type="submit" class="admin-btn admin-btn-primary">Сохранить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Модальное окно для создания/редактирования темы -->
+  <div id="topicModal" class="admin-modal">
+    <div class="admin-modal-content">
+      <div class="admin-modal-header">
+        <h2 class="admin-modal-title" id="topicModalTitle">Создать тему</h2>
+        <button class="admin-modal-close" data-modal="topicModal">×</button>
+      </div>
+      <form id="topicForm">
+        <input type="hidden" id="topicId" name="id">
+        <div class="admin-form-group">
+          <label class="admin-form-label">Предмет *</label>
+          <select class="admin-form-select" id="topicSubjectId" name="subjectId" required>
+            <option value="">Выберите предмет</option>
+          </select>
+        </div>
+        <div class="admin-form-group">
+          <label class="admin-form-label">Название темы *</label>
+          <input type="text" class="admin-form-input" id="topicName" name="name" required>
+        </div>
+        <div class="admin-form-group">
+          <label class="admin-form-label">Описание</label>
+          <textarea class="admin-form-textarea" id="topicDescription" name="description"></textarea>
+        </div>
+        <div class="admin-form-group">
+          <label class="admin-form-label">Порядок сортировки</label>
+          <input type="number" class="admin-form-input" id="topicOrderIndex" name="orderIndex" value="0">
+        </div>
+        <div class="admin-form-actions">
+          <button type="button" class="admin-btn admin-btn-ghost" data-modal="topicModal">Отмена</button>
+          <button type="submit" class="admin-btn admin-btn-primary">Сохранить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Модальное окно для создания/редактирования варианта -->
+  <div id="variantModal" class="admin-modal">
+    <div class="admin-modal-content" style="max-width:800px;">
+      <div class="admin-modal-header">
+        <h2 class="admin-modal-title" id="variantModalTitle">Создать вариант ОГЭ</h2>
+        <button class="admin-modal-close" data-modal="variantModal">×</button>
+      </div>
+      <form id="variantForm">
+        <input type="hidden" id="variantId" name="id">
+        <div class="admin-form-group">
+          <label class="admin-form-label">Предмет *</label>
+          <select class="admin-form-select" id="variantSubjectId" name="subjectId" required>
+            <option value="">Выберите предмет</option>
+          </select>
+        </div>
+        <div class="admin-form-group">
+          <label class="admin-form-label">Название варианта *</label>
+          <input type="text" class="admin-form-input" id="variantName" name="variantName" required>
+        </div>
+        <div class="admin-form-group">
+          <label class="admin-form-label">Описание</label>
+          <textarea class="admin-form-textarea" id="variantDescription" name="description"></textarea>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="admin-form-group">
+            <label class="admin-form-label">Максимальный балл</label>
+            <input type="number" class="admin-form-input" id="variantTotalPoints" name="totalPoints" value="0" min="0">
+          </div>
+          <div class="admin-form-group">
+            <label class="admin-form-label">Время на выполнение (минуты)</label>
+            <input type="number" class="admin-form-input" id="variantTimeLimit" name="timeLimit" min="1">
+          </div>
+        </div>
+        <div class="admin-form-group">
+          <label style="display:flex;align-items:center;gap:8px;">
+            <input type="checkbox" id="variantIsPublished" name="isPublished">
+            <span>Опубликовать вариант</span>
+          </label>
+        </div>
+        <div class="admin-form-actions">
+          <button type="button" class="admin-btn admin-btn-ghost" data-modal="variantModal">Отмена</button>
+          <button type="submit" class="admin-btn admin-btn-primary">Сохранить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Модальное окно для управления задачами варианта -->
+  <div id="variantTasksModal" class="admin-modal">
+    <div class="admin-modal-content" style="max-width:900px;">
+      <div class="admin-modal-header">
+        <h2 class="admin-modal-title" id="variantTasksModalTitle">Задачи варианта</h2>
+        <button class="admin-modal-close" data-modal="variantTasksModal">×</button>
+      </div>
+      <div id="variantTasksContent">
+        <div class="admin-loading">Загрузка задач...</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api-client.js"></script>
+  <script src="auth.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

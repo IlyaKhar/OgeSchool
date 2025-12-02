@@ -1,0 +1,181 @@
+ .pricing-hero {
+  text-align: center;
+  padding: 80px 0 60px;
+}
+
+.pricing-hero h1 {
+  font-size: 48px;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, #155EEF 0%, #3B82F6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.pricing-hero p {
+  font-size: 20px;
+  color: var(--text-muted);
+  max-width: 600px;
+  margin: 0 auto 40px;
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 32px;
+  margin: 60px 0;
+}
+
+.pricing-card {
+  background: linear-gradient(165deg, #ffffff, #f8f9fe);
+  border: 2px solid var(--border);
+  border-radius: 20px;
+  padding: 40px 32px;
+  text-align: center;
+  position: relative;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.pricing-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  border-color: var(--primary);
+}
+
+.pricing-card.featured {
+  border-color: var(--primary);
+  background: linear-gradient(165deg, #ffffff, #f0f4ff);
+  transform: scale(1.05);
+}
+
+.pricing-card.featured::before {
+  content: "ПОПУЛЯРНЫЙ ПЛАН";
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #155EEF, #3B82F6);
+  color: white;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.plan-name {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.plan-subtitle {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 24px;
+  font-style: italic;
+}
+
+.price {
+  font-size: 48px;
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: 8px;
+  font-family: Manrope, sans-serif;
+}
+
+.price-period {
+  font-size: 16px;
+  color: var(--text-muted);
+  margin-bottom: 32px;
+}
+
+.features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 32px;
+  text-align: left;
+}
+
+.features li {
+  padding: 8px 0;
+  color: var(--text);
+  position: relative;
+  padding-left: 28px;
+}
+
+.features li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: #10b981;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.buy-btn {
+  width: 100%;
+  padding: 16px 24px;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+.buy-btn.primary {
+  background: linear-gradient(135deg, #155EEF 0%, #3B82F6 100%);
+  color: white;
+}
+
+.buy-btn.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(21, 94, 239, 0.4);
+}
+
+.buy-btn.secondary {
+  background: linear-gradient(135deg, #155EEF 0%, #3B82F6 100%);
+  color: white;
+}
+
+.buy-btn.secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(21, 94, 239, 0.4);
+}
+
+.buy-btn.tertiary {
+  background: linear-gradient(135deg, #155EEF 0%, #3B82F6 100%);
+  color: white;
+}
+
+.buy-btn.tertiary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(21, 94, 239, 0.4);
+}
+
+.emoji {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .pricing-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .pricing-card.featured {
+    transform: none;
+  }
+
+  .pricing-hero h1 {
+    font-size: 36px;
+  }
+}
+
+

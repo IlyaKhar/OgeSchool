@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Пробный экзамен ОГЭ — OGE Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="global.css">
+  <link rel="stylesheet" href="components.css">
+  <link rel="stylesheet" href="auth.css">
+  <link rel="stylesheet" href="css/test-page.css">
+</head>
+<body>
+  <header class="site-header site-header-dark">
+    <div class="container nav">
+      <div class="logo">OGE</div>
+      <div class="nav-center">
+        <nav class="menu nav-pill">
+          <a href="index.html">Главная</a>
+          <a href="about.html">О нас</a>
+          <a href="pricing.html">Тарифы</a>
+          <a href="tasks.html">Карта заданий</a>
+          <a href="tasks-database.html">База заданий</a>
+        </nav>
+      </div>
+      <div class="actions" id="authActions">
+        <a href="#login" class="btn btn-ghost">Войти</a>
+        <a href="#signup" class="btn btn-primary">Попробовать</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="test-container">
+      <!-- Заголовок теста -->
+      <div class="test-header" id="testHeader">
+        <div class="test-title" id="testTitle">Загрузка теста...</div>
+        <div class="test-subtitle" id="testSubtitle"></div>
+        <div class="test-info">
+          <div class="test-timer" id="testTimer">00:00:00</div>
+          <div class="test-progress" id="testProgress">0 / 0</div>
+        </div>
+      </div>
+
+      <!-- Предупреждение о времени -->
+      <div class="timer-warning" id="timerWarning" style="display: none;">
+        ⏰ Осталось менее 10 минут!
+      </div>
+
+      <!-- Навигация -->
+      <div class="test-navigation" id="testNavigation" style="display: none;">
+        <button class="nav-button" id="prevButton" onclick="previousTask()">← Предыдущее</button>
+        <div class="task-counter" id="taskCounter">Задание 1 из 20</div>
+        <button class="nav-button" id="nextButton" onclick="nextTask()">Следующее →</button>
+      </div>
+
+      <!-- Задание -->
+      <div class="task-card" id="taskCard" style="display: none;">
+        <div class="task-header">
+          <div class="task-number" id="taskNumber">Задание 1</div>
+          <div class="task-difficulty" id="taskDifficulty">Уровень 2</div>
+        </div>
+        <div class="task-question" id="taskQuestion">Загрузка вопроса...</div>
+        <div class="task-options" id="taskOptions">
+          <!-- Варианты ответов будут загружены динамически -->
+        </div>
+      </div>
+
+      <!-- Действия -->
+      <div class="test-actions" id="testActions" style="display: none;">
+        <div>
+          <button class="nav-button" onclick="previousTask()" id="prevActionButton">← Предыдущее</button>
+        </div>
+        <div>
+          <button class="btn-finish" onclick="finishTest()" id="finishButton">Завершить тест</button>
+        </div>
+        <div>
+          <button class="nav-button" onclick="nextTask()" id="nextActionButton">Следующее →</button>
+        </div>
+      </div>
+
+      <!-- Результаты -->
+      <div class="test-summary" id="testSummary" style="display: none;">
+        <div class="summary-title">Результаты теста</div>
+        <div class="summary-stats">
+          <div class="summary-stat">
+            <div class="summary-stat-number" id="scoreNumber">0</div>
+            <div class="summary-stat-label">Баллов набрано</div>
+          </div>
+          <div class="summary-stat">
+            <div class="summary-stat-number" id="maxScoreNumber">0</div>
+            <div class="summary-stat-label">Максимум баллов</div>
+          </div>
+          <div class="summary-stat">
+            <div class="summary-stat-number" id="percentageNumber">0%</div>
+            <div class="summary-stat-label">Процент выполнения</div>
+          </div>
+          <div class="summary-stat">
+            <div class="summary-stat-number" id="timeSpentNumber">0:00</div>
+            <div class="summary-stat-label">Время выполнения</div>
+          </div>
+        </div>
+        <div class="summary-actions">
+          <button class="btn-retry" onclick="retryTest()">Повторить тест</button>
+          <button class="btn-dashboard" onclick="goToDashboard()">В личный кабинет</button>
+        </div>
+      </div>
+
+      <!-- Загрузка -->
+      <div class="loading" id="loading">
+        <h3>Загрузка теста...</h3>
+        <p>Пожалуйста, подождите</p>
+      </div>
+
+      <!-- Ошибка -->
+      <div class="error" id="error" style="display: none;">
+        <h3>Ошибка загрузки теста</h3>
+        <p id="errorMessage"></p>
+        <button class="btn-retry" onclick="location.reload()">Обновить страницу</button>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/api-client.js"></script>
+  <script src="auth.js"></script>
+  <script src="js/test-page.js"></script>
+</body>
+</html>
+

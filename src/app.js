@@ -57,24 +57,20 @@ const aiLimiter = rateLimit({
   message: { error: 'Слишком много AI-запросов. Попробуйте чуть позже.' }
 });
 
-// Определяем путь к статическим файлам (на Vercel это корень проекта)
-const staticPath = path.join(__dirname, '..');
+// Определяем путь к статическим файлам
+// На Vercel используем папку public, локально - корень проекта
+const publicPath = path.join(__dirname, '..', 'public');
+const rootPath = path.join(__dirname, '..');
 const fs = require('fs');
 
-// Проверяем, существует ли путь
-if (fs.existsSync(staticPath)) {
-  console.log('Static files path:', staticPath);
-  console.log('__dirname:', __dirname);
-  
-  // Логируем содержимое директории для отладки
-  try {
-    const files = fs.readdirSync(staticPath);
-    console.log('Files in static path:', files.filter(f => f.match(/\.(css|js|html)$/)).slice(0, 10));
-  } catch (err) {
-    console.error('Error reading static path:', err.message);
-  }
+// Проверяем, какая директория существует
+let staticPath;
+if (fs.existsSync(publicPath)) {
+  staticPath = publicPath;
+  console.log('Using public directory for static files:', staticPath);
 } else {
-  console.error('Static path does not exist:', staticPath);
+  staticPath = rootPath;
+  console.log('Using root directory for static files:', staticPath);
 }
 
 // Статика для всех файлов (CSS, JS, изображения и т.д.)

@@ -1,0 +1,816 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Личный кабинет — Подготовка к ОГЭ 9 класса | OGE Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="theme.css">
+  <script src="js/theme.js"></script>
+  <link rel="stylesheet" href="global.css">
+  <link rel="stylesheet" href="components.css">
+  <link rel="stylesheet" href="auth.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <style>
+    /* Основной контейнер */
+    .dashboard-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    /* Статистика */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+    
+    .stat-card {
+      background: linear-gradient(135deg, #155EEF, #3B82F6);
+      color: white;
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(21, 94, 239, 0.3);
+      transition: transform 0.3s ease;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .stat-number {
+      font-size: 36px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    
+    .stat-label {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+    
+    /* AI Чат */
+    .ai-chat-section {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      margin-bottom: 40px;
+      overflow: hidden;
+    }
+    
+    .chat-header {
+      background: linear-gradient(135deg, #155EEF, #3B82F6);
+      color: white;
+      padding: 24px;
+      text-align: center;
+    }
+    
+    .chat-header h2 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+    }
+    
+    .chat-header p {
+      margin: 8px 0 0 0;
+      opacity: 0.9;
+      font-size: 14px;
+    }
+    
+    .chat-messages {
+      height: 400px;
+      overflow-y: auto;
+      padding: 20px;
+      background: #f8fafc;
+    }
+    
+    .message {
+      margin-bottom: 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    
+    .message.user {
+      flex-direction: row-reverse;
+    }
+    
+    .message-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    
+    .message.user .message-avatar {
+      background: linear-gradient(135deg, #155EEF, #3B82F6);
+      color: white;
+    }
+    
+    .message.ai .message-avatar {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+    }
+    
+    .message-content {
+      max-width: 70%;
+      padding: 16px 20px;
+      border-radius: 18px;
+      position: relative;
+    }
+    
+    .message.user .message-content {
+      background: linear-gradient(135deg, #155EEF, #3B82F6);
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+    
+    .message.ai .message-content {
+      background: white;
+      color: #1f2937;
+      border: 2px solid #e5e7eb;
+      border-bottom-left-radius: 4px;
+    }
+    
+    .message.error .message-content {
+      background: #fef2f2;
+      border-color: #fca5a5;
+      color: #991b1b;
+    }
+    
+    .message.error .message-content a {
+      color: #dc2626;
+      text-decoration: underline;
+    }
+    
+    .message-text {
+      line-height: 1.5;
+      margin: 0;
+    }
+    
+    .message-time {
+      font-size: 11px;
+      opacity: 0.7;
+      margin-top: 8px;
+    }
+    
+    .message.user .message-time {
+      text-align: right;
+    }
+    
+    .typing-indicator {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 16px 20px;
+      background: white;
+      border: 2px solid #e5e7eb;
+      border-radius: 18px;
+      border-bottom-left-radius: 4px;
+      max-width: 70%;
+    }
+    
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #155EEF;
+      animation: typing 1.4s infinite ease-in-out;
+    }
+    
+    .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+    
+    @keyframes typing {
+      0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+    
+    .chat-input {
+      padding: 20px;
+      background: white;
+      border-top: 1px solid #e5e7eb;
+    }
+    
+    .input-container {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    
+    .chat-input input {
+      flex: 1;
+      padding: 16px 20px;
+      border: 2px solid #e5e7eb;
+      border-radius: 25px;
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+    
+    .chat-input input:focus {
+      border-color: #155EEF;
+    }
+    
+    .send-button {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #155EEF, #3B82F6);
+      color: white;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      transition: transform 0.3s ease;
+    }
+    
+    .send-button:hover {
+      transform: scale(1.1);
+    }
+    
+    .send-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    /* Блокировка чата для бесплатных пользователей */
+    .chat-locked-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(4px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      text-align: center;
+      z-index: 10;
+      border-radius: 20px;
+    }
+    
+    .chat-locked-content {
+      max-width: 500px;
+    }
+    
+    .chat-locked-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+    }
+    
+    .chat-locked-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 12px;
+    }
+    
+    .chat-locked-text {
+      font-size: 16px;
+      color: #6b7280;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    
+    .chat-locked-button {
+      background: linear-gradient(135deg, #155EEF, #3B82F6);
+      color: white;
+      border: none;
+      padding: 14px 32px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+    
+    .chat-locked-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(21, 94, 239, 0.4);
+    }
+    
+    .ai-chat-section {
+      position: relative;
+    }
+    
+    /* Нижние карточки */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+    
+    .feature-card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      transition: transform 0.3s ease;
+    }
+
+    /* План подготовки */
+    .plan-card .card-icon {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: #ffffff;
+    }
+
+    .plan-summary {
+      font-size: 14px;
+      color: #4b5563;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    .plan-meta {
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 12px;
+    }
+
+    .plan-ai-block {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px dashed #e5e7eb;
+    }
+
+    .plan-ai-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #4b5563;
+      margin-bottom: 6px;
+    }
+
+    .plan-ai-text {
+      font-size: 14px;
+      color: #4b5563;
+      line-height: 1.6;
+      white-space: pre-line;
+    }
+
+    .plan-empty {
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 12px;
+    }
+
+    .plan-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #ecfdf3;
+      color: #16a34a;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .plan-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #e5e7eb;
+      color: #374151;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .btn-outline:hover {
+      background: #f3f4f6;
+    }
+
+    .explain-button {
+      background: linear-gradient(135deg, #155EEF, #3B82F6);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: transform 0.3s ease;
+      font-size: 14px;
+    }
+    
+    .explain-button:hover {
+      transform: translateY(-2px);
+    }
+
+    /* Прогресс во всю ширину */
+    .progress-full {
+      grid-column: 1 / -1;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    
+    .card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+    
+    .card-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1f2937;
+      margin: 0;
+    }
+    
+    /* Прогресс по предметам */
+    .progress-card .card-icon {
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      color: white;
+    }
+    
+    .subject-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    
+    .subject-item:last-child {
+      border-bottom: none;
+    }
+    
+    .subject-name {
+      font-weight: 600;
+      color: #374151;
+    }
+    
+    .subject-progress {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .progress-bar {
+      width: 80px;
+      height: 8px;
+      background: #e5e7eb;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+    
+    .progress-percentage {
+      font-weight: 700;
+      color: #3b82f6;
+      font-size: 14px;
+    }
+    
+    /* Рекомендации */
+    .recommendations-card .card-icon {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+    }
+    
+    .recommendation-item {
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      border-left: 4px solid #10b981;
+    }
+    
+    .recommendation-title {
+      font-weight: 600;
+      color: #1f2937;
+      margin-bottom: 8px;
+    }
+    
+    .recommendation-text {
+      color: #6b7280;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* История вариантов */
+    .results-card .card-icon {
+      background: linear-gradient(135deg, #f97316, #ea580c);
+      color: #ffffff;
+    }
+
+    .results-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .results-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #f3f4f6;
+      gap: 12px;
+    }
+
+    .results-item:last-child {
+      border-bottom: none;
+    }
+
+    .results-main {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .results-title {
+      font-weight: 600;
+      color: #111827;
+      font-size: 14px;
+    }
+
+    .results-meta {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .results-score {
+      text-align: right;
+      font-size: 14px;
+      font-weight: 600;
+      color: #16a34a;
+    }
+
+    .results-percentage {
+      display: block;
+    }
+
+    .results-date {
+      display: block;
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .results-empty {
+      font-size: 14px;
+      color: #6b7280;
+      line-height: 1.6;
+    }
+    
+    /* Результаты */
+    /* Временный блок: оставлено пустым для совместимости, основные стили в css/dashboard.css */
+  </style>
+</head>
+<body>
+  <header class="site-header site-header-dark">
+    <div class="container nav">
+      <div class="logo">OGE</div>
+      <div class="nav-center">
+        <nav class="menu nav-pill">
+          <a href="index.html">Главная</a>
+          <a href="about.html">О нас</a>
+          <a href="pricing.html">Тарифы</a>
+          <a href="tasks.html">Карта заданий</a>
+          <a href="tasks-database.html">База заданий</a>
+          <a href="exams.html">Экзамены</a>
+        </nav>
+      </div>
+      <div class="actions">
+        <!-- Будет заполнено через JavaScript -->
+      </div>
+    </div>
+  </header>
+  
+  <main>
+    <div class="dashboard-container">
+      <!-- Статистика -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-number" id="completedTasks">0</div>
+          <div class="stat-label">Выполнено заданий</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="totalTasks">0</div>
+          <div class="stat-label">Всего заданий</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="progressPercentage">0%</div>
+          <div class="stat-label">Общий прогресс</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="streakDays">0</div>
+          <div class="stat-label">Дней подряд</div>
+        </div>
+      </div>
+
+      <!-- AI Чат -->
+      <div class="ai-chat-section">
+        <div class="chat-header">
+          <h2>AI‑помощник по ОГЭ</h2>
+          <p>Задавайте любые вопросы по подготовке к ОГЭ 9 класса: темы, задания, разбор ошибок</p>
+        </div>
+        
+        <!-- Overlay для блокировки чата на бесплатном плане -->
+        <div class="chat-locked-overlay" id="chatLockedOverlay" style="display: none;">
+          <div class="chat-locked-content">
+            <div class="chat-locked-icon"></div>
+            <h3 class="chat-locked-title">AI-чат доступен только на платных подписках</h3>
+            <p class="chat-locked-text">
+              Для использования AI-помощника необходимо оформить платную подписку. 
+              Выберите тариф, который подходит именно вам, и получите доступ к умному помощнику, 
+              который ответит на любые вопросы по подготовке к ОГЭ.
+            </p>
+            <a href="pricing.html" class="chat-locked-button">Посмотреть тарифы</a>
+          </div>
+        </div>
+        
+        <div class="chat-messages" id="aiMessages">
+          <div class="message ai">
+            <div class="message-avatar">AI</div>
+            <div class="message-content">
+              <p class="message-text">Привет! Я - нейронная сеть GPT-4, готовая помочь тебе с подготовкой к ЕГЭ/ОГЭ. Задавай любые вопросы по математике, русскому языку, физике, химии или другим предметам! Я дам подробные объяснения и пошаговые решения.</p>
+              <div class="message-time">Сейчас</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="chat-input">
+          <div class="input-container">
+            <input type="text" id="aiInput" placeholder="Задайте вопрос AI-помощнику...">
+            <button class="send-button" id="sendButton" onclick="sendAIMessage()">➤</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Нижние карточки -->
+      <div class="cards-grid">
+        <!-- План подготовки -->
+        <div class="feature-card plan-card">
+          <div class="card-header">
+            <div class="card-icon"></div>
+            <h3 class="card-title">План подготовки к ОГЭ</h3>
+          </div>
+          <div id="studyPlanContent">
+            <p class="plan-empty">
+              Распланируйте подготовку к ОГЭ: выберите предметы, дату экзамена и сколько раз в неделю будете заниматься.
+            </p>
+          </div>
+          <div class="plan-actions">
+            <button class="explain-button" style="flex: 1;" onclick="openStudyPlanModal()">Настроить план</button>
+            <button class="btn-outline" type="button" onclick="openStudyPlanModal()">Изменить</button>
+          </div>
+        </div>
+
+        <!-- Персональные рекомендации -->
+        <div class="feature-card recommendations-card">
+          <div class="card-header">
+            <div class="card-icon"></div>
+            <h3 class="card-title">Персональные рекомендации</h3>
+          </div>
+          <div id="aiSuggestions">
+            <!-- Будет заполнено через JavaScript -->
+          </div>
+        </div>
+
+        <!-- История вариантов ОГЭ -->
+        <div class="feature-card results-card">
+          <div class="card-header">
+            <div class="card-icon"></div>
+            <h3 class="card-title">История решённых вариантов</h3>
+          </div>
+          <div id="testResultsHistory">
+            <p class="results-empty">
+              Пока нет решённых вариантов. Пройди пробный экзамен ОГЭ, и здесь появится история с баллами и датами.
+            </p>
+          </div>
+        </div>
+
+        <!-- Прогресс по предметам (перемещено вниз и во всю ширину) -->
+        <div class="feature-card progress-card progress-full">
+          <div class="card-header">
+            <div class="card-icon"></div>
+            <h3 class="card-title">Прогресс по предметам</h3>
+          </div>
+          <div id="subjectProgress">
+            <!-- Будет заполнено через JavaScript -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Модальное окно плана подготовки -->
+  <div class="plan-modal-backdrop" id="studyPlanModal">
+    <div class="plan-modal">
+      <div class="plan-modal-header">
+        <h2 class="plan-modal-title">План подготовки к ОГЭ</h2>
+        <button class="plan-modal-close" type="button" onclick="closeStudyPlanModal()">×</button>
+      </div>
+      <p class="plan-meta">Ответь на несколько вопросов — мы поможем распределить подготовку к ОГЭ 9 класса по неделям.</p>
+      <form id="studyPlanForm" class="plan-modal-form">
+        <div>
+          <label for="planExamDate">Дата экзамена (примерно)</label>
+          <input type="date" id="planExamDate" name="examDate">
+          <small>Можно указать ориентировочную дату конца мая / июня.</small>
+        </div>
+        <div>
+          <label>Предметы ОГЭ для подготовки</label>
+          <div class="plan-checkboxes">
+            <label><input type="checkbox" name="subjects" value="Русский язык" checked> Русский язык</label>
+            <label><input type="checkbox" name="subjects" value="Математика" checked> Математика</label>
+            <label><input type="checkbox" name="subjects" value="Информатика"> Информатика</label>
+            <label><input type="checkbox" name="subjects" value="Обществознание"> Обществознание</label>
+          </div>
+        </div>
+        <div>
+          <label for="planTargetGrade">Цель по оценке</label>
+          <select id="planTargetGrade" name="targetGrade">
+            <option value="4">Хочу уверенную 4</option>
+            <option value="5">Цель — крепкая 5</option>
+            <option value="3">Просто сдать без стресса</option>
+          </select>
+        </div>
+        <div>
+          <label for="planDaysPerWeek">Сколько дней в неделю заниматься?</label>
+          <input type="number" id="planDaysPerWeek" name="daysPerWeek" min="1" max="7" value="3">
+        </div>
+        <div class="plan-modal-footer">
+          <button type="button" class="btn-outline" onclick="closeStudyPlanModal()">Отмена</button>
+          <button type="submit" class="explain-button">Сохранить план</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <div class="logo">OGE</div>
+        <p class="muted">© 2025 OGE Platform</p>
+      </div>
+      <div>
+        <h4>Продукт</h4>
+        <a href="index.html#features">Возможности</a>
+        <a href="pricing.html">Тарифы</a>
+        <a href="#">Безопасность</a>
+      </div>
+      <div>
+        <h4>Ресурсы</h4>
+        <a href="#">Документация</a>
+        <a href="#">Блог</a>
+        <a href="#">Помощь</a>
+      </div>
+      <div>
+        <h4>Компания</h4>
+        <a href="about.html">О нас</a>
+        <a href="#">Контакты</a>
+
+      </div>
+    </div>
+  </footer>
+  
+  <script src="js/api-client.js"></script>
+  <script src="auth.js"></script>
+  <script src="ai-service.js"></script>
+  <script src="js/database-api.js"></script>
+  <script src="dashboard.js"></script>
+</body>
+</html>

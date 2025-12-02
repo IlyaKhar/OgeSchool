@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Настройки профиля — Подготовка к ОГЭ 9 класса | OGE Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="theme.css">
+  <script src="js/theme.js"></script>
+  <link rel="stylesheet" href="global.css">
+  <link rel="stylesheet" href="components.css">
+  <link rel="stylesheet" href="auth.css">
+  <link rel="stylesheet" href="css/settings.css">
+</head>
+<body>
+  <header class="site-header site-header-dark">
+    <div class="container nav">
+      <div class="logo">OGE</div>
+      <div class="nav-center">
+        <nav class="menu nav-pill">
+          <a href="index.html">Главная</a>
+          <a href="about.html">О нас</a>
+          <a href="pricing.html">Тарифы</a>
+          <a href="tasks.html">Карта заданий</a>
+        </nav>
+      </div>
+      <div class="actions">
+        <!-- Будет заполнено через JavaScript -->
+      </div>
+    </div>
+  </header>
+  
+  <main>
+    <section class="dashboard-header">
+      <div class="container">
+        <h1>Настройки профиля</h1>
+        <p>Обновляйте данные ученика 9 класса, подписку и предпочтения подготовки к ОГЭ</p>
+      </div>
+    </section>
+
+    <section class="dashboard">
+      <div class="container">
+        <div class="settings-container">
+          <!-- Боковая панель навигации -->
+          <div class="settings-sidebar">
+            <nav class="settings-nav">
+              <ul>
+                <li><a href="#profile" class="settings-nav-link active" data-section="profile">Профиль</a></li>
+                <li><a href="#notifications" class="settings-nav-link" data-section="notifications">Уведомления</a></li>
+                <li><a href="#appearance" class="settings-nav-link" data-section="appearance">Внешний вид</a></li>
+                <li><a href="#security" class="settings-nav-link" data-section="security">Безопасность</a></li>
+                <li><a href="#subscription" class="settings-nav-link" data-section="subscription">Подписка</a></li>
+                <li><a href="#data" class="settings-nav-link" data-section="data">Данные</a></li>
+              </ul>
+            </nav>
+          </div>
+
+          <!-- Основной контент -->
+          <div class="settings-content">
+            <!-- Профиль -->
+            <div id="profile" class="settings-section active">
+              <h2>Профиль пользователя</h2>
+              
+              <div class="avatar-upload">
+                <div class="avatar-preview" id="avatarPreview">
+                  <span id="avatarInitials">ИХ</span>
+                </div>
+                <input type="file" id="avatarInput" accept="image/*" style="display: none;">
+                <button onclick="document.getElementById('avatarInput').click()" class="auth-btn auth-btn-secondary">
+                  Загрузить фото
+                </button>
+              </div>
+
+              <form id="profileForm">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="profileFirstName">Имя</label>
+                    <input type="text" id="profileFirstName" name="firstName" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="profileLastName">Фамилия</label>
+                    <input type="text" id="profileLastName" name="lastName" required>
+                  </div>
+                </div>
+                
+                <div class="form-group">
+                  <label for="profileEmail">Email</label>
+                  <input type="email" id="profileEmail" name="email" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="profilePhone">Номер телефона</label>
+                  <input type="tel" id="profilePhone" name="phone" required>
+                </div>
+                
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="profileAge">Возраст</label>
+                    <input type="number" id="profileAge" name="age" min="14" max="18" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="profileGrade">Класс</label>
+                    <select id="profileGrade" name="grade" required>
+                      <option value="9">9 класс</option>
+                      <option value="10">10 класс</option>
+                      <option value="11">11 класс</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div class="form-group">
+                  <label for="profileBio">О себе</label>
+                  <textarea id="profileBio" name="bio" rows="4" placeholder="Расскажите немного о себе..."></textarea>
+                </div>
+                
+                <button type="submit" class="auth-btn auth-btn-primary">Сохранить изменения</button>
+              </form>
+            </div>
+
+            <!-- Уведомления -->
+            <div id="notifications" class="settings-section">
+              <h2>Настройки уведомлений</h2>
+              
+              <div class="toggle-item">
+                <div class="toggle-info">
+                  <h4>Email уведомления</h4>
+                  <p>Получать уведомления о новых заданиях и прогрессе на email</p>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="emailNotifications" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              
+              <div class="toggle-item">
+                <div class="toggle-info">
+                  <h4>Напоминания о занятиях</h4>
+                  <p>Ежедневные напоминания о необходимости заниматься</p>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="studyReminders" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              
+              <div class="toggle-item">
+                <div class="toggle-info">
+                  <h4>Достижения</h4>
+                  <p>Уведомления о полученных достижениях и наградах</p>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="achievementNotifications" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              
+              <div class="toggle-item">
+                <div class="toggle-info">
+                  <h4>Новости платформы</h4>
+                  <p>Информация о новых функциях и обновлениях</p>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="platformNews">
+                  <span class="slider"></span>
+                </label>
+              </div>
+              
+              <button onclick="saveNotificationSettings()" class="auth-btn auth-btn-primary" style="margin-top: 24px;">
+                Сохранить настройки
+              </button>
+            </div>
+
+            <!-- Внешний вид -->
+            <div id="appearance" class="settings-section">
+              <h2>Внешний вид</h2>
+              
+              <div class="form-group">
+                <label for="themeSelect">Тема оформления</label>
+                <select id="themeSelect">
+                  <option value="auto">Автоматически</option>
+                  <option value="light">Светлая</option>
+                  <option value="dark">Тёмная</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label for="fontSize">Размер шрифта</label>
+                <select id="fontSize">
+                  <option value="small">Маленький</option>
+                  <option value="medium" selected>Средний</option>
+                  <option value="large">Большой</option>
+                </select>
+              </div>
+              
+              <div class="toggle-item">
+                <div class="toggle-info">
+                  <h4>Компактный режим</h4>
+                  <p>Уменьшить отступы и размеры элементов</p>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="compactMode">
+                  <span class="slider"></span>
+                </label>
+              </div>
+              
+              <div class="toggle-item">
+                <div class="toggle-info">
+                  <h4>Анимации</h4>
+                  <p>Показывать анимации и переходы</p>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="animations" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              
+              <button onclick="saveAppearanceSettings()" class="auth-btn auth-btn-primary" style="margin-top: 24px;">
+                Применить настройки
+              </button>
+            </div>
+
+            <!-- Безопасность -->
+            <div id="security" class="settings-section">
+              <h2>Безопасность</h2>
+              
+              <form id="passwordForm">
+                <div class="form-group">
+                  <label for="currentPassword">Текущий пароль</label>
+                  <input type="password" id="currentPassword" name="currentPassword" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="newPassword">Новый пароль</label>
+                  <input type="password" id="newPassword" name="newPassword" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="confirmPassword">Подтвердите новый пароль</label>
+                  <input type="password" id="confirmPassword" name="confirmPassword" required>
+                </div>
+                
+                <button type="submit" class="auth-btn auth-btn-primary">Изменить пароль</button>
+              </form>
+              
+              <div class="toggle-item" style="margin-top: 32px;">
+                <div class="toggle-info">
+                  <h4>Двухфакторная аутентификация</h4>
+                  <p>Дополнительная защита аккаунта с помощью SMS</p>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="twoFactorAuth">
+                  <span class="slider"></span>
+                </label>
+              </div>
+              
+              <div class="toggle-item">
+                <div class="toggle-info">
+                  <h4>Сессии</h4>
+                  <p>Завершить все активные сессии на других устройствах</p>
+                </div>
+                <button onclick="logoutAllSessions()" class="auth-btn auth-btn-secondary">
+                  Завершить все сессии
+                </button>
+              </div>
+            </div>
+
+            <!-- Подписка -->
+            <div id="subscription" class="settings-section">
+              <h2>Подписка</h2>
+              
+              <div class="stats-grid">
+                <div class="stat-card">
+                  <div class="stat-number" id="subscriptionType">Бесплатный</div>
+                  <div class="stat-label">Текущий план</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-number" id="subscriptionStatus">Активна</div>
+                  <div class="stat-label">Статус</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-number" id="subscriptionExpiry">-</div>
+                  <div class="stat-label">Действует до</div>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label for="autoRenewal">Автопродление</label>
+                <select id="autoRenewal">
+                  <option value="enabled">Включено</option>
+                  <option value="disabled">Отключено</option>
+                </select>
+              </div>
+              
+              <div style="margin-top: 24px;">
+                <a href="pricing.html" class="auth-btn auth-btn-primary">Изменить план</a>
+                <button onclick="cancelSubscription()" class="auth-btn auth-btn-secondary" style="margin-left: 12px;">
+                  Отменить подписку
+                </button>
+              </div>
+            </div>
+
+            <!-- Данные -->
+            <div id="data" class="settings-section">
+              <h2>Данные и статистика</h2>
+              
+              <div class="stats-grid">
+                <div class="stat-card">
+                  <div class="stat-number" id="totalTasks">0</div>
+                  <div class="stat-label">Всего заданий</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-number" id="completedTasks">0</div>
+                  <div class="stat-label">Выполнено</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-number" id="studyTime">0ч</div>
+                  <div class="stat-label">Время обучения</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-number" id="streakDays">0</div>
+                  <div class="stat-label">Дней подряд</div>
+                </div>
+              </div>
+              
+              <div style="margin-top: 24px;">
+                <button onclick="exportData()" class="auth-btn auth-btn-primary">
+                  📥 Экспортировать данные
+                </button>
+                <button onclick="importData()" class="auth-btn auth-btn-secondary" style="margin-left: 12px;">
+                  📤 Импортировать данные
+                </button>
+              </div>
+              
+              <div class="danger-zone">
+                <h3>⚠️ Опасная зона</h3>
+                <p>Удаление аккаунта необратимо. Все ваши данные, прогресс и настройки будут безвозвратно удалены.</p>
+                <button onclick="deleteAccount()" class="btn-danger">
+                  Удалить аккаунт
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <div class="logo">OGE</div>
+        <p class="muted">© 2025 OGE Platform</p>
+      </div>
+      <div>
+        <h4>Продукт</h4>
+        <a href="index.html#features">Возможности</a>
+        <a href="pricing.html">Тарифы</a>
+        <a href="#">Безопасность</a>
+      </div>
+      <div>
+        <h4>Ресурсы</h4>
+        <a href="#">Документация</a>
+        <a href="#">Блог</a>
+        <a href="#">Помощь</a>
+      </div>
+      <div>
+        <h4>Компания</h4>
+        <a href="about.html">О нас</a>
+        <a href="#">Контакты</a>
+      </div>
+    </div>
+  </footer>
+  
+  <script src="js/api-client.js"></script>
+  <script src="auth.js"></script>
+  <script src="settings.js"></script>
+</body>
+</html>

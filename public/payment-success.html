@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Оплата успешна — OGE Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="global.css">
+  <link rel="stylesheet" href="components.css">
+  <link rel="stylesheet" href="auth.css">
+  <style>
+    .success-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+    .success-card {
+      background: white;
+      border: 2px solid var(--border);
+      border-radius: 20px;
+      padding: 48px;
+      max-width: 500px;
+      text-align: center;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+    }
+    .success-icon {
+      font-size: 64px;
+      margin-bottom: 24px;
+    }
+    .success-title {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 16px;
+    }
+    .success-message {
+      font-size: 18px;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+    }
+  </style>
+</head>
+<body>
+  <div class="success-container">
+    <div class="success-card">
+      <div class="success-icon"></div>
+      <h1 class="success-title">Оплата успешна!</h1>
+      <p class="success-message">Ваша подписка активирована. Теперь у вас есть доступ ко всем функциям платформы.</p>
+      <div style="display: flex; gap: 12px; justify-content: center;">
+        <a href="dashboard.html" class="auth-btn auth-btn-primary">Перейти в личный кабинет</a>
+        <a href="index.html" class="auth-btn auth-btn-secondary">На главную</a>
+      </div>
+    </div>
+  </div>
+  <script src="js/api-client.js"></script>
+  <script src="auth.js"></script>
+  <script>
+    // Проверяем статус платежа при загрузке страницы
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const paymentId = urlParams.get('payment_id');
+      
+      if (paymentId && window.apiClient && window.apiClient.accessToken) {
+        try {
+          const response = await window.apiClient.get(`/api/payment/status/${paymentId}`);
+          
+          if (response.payment && response.payment.paid) {
+            // Платеж успешен, обновляем данные пользователя
+            const userData = await window.apiClient.get('/api/auth/me');
+            localStorage.setItem('currentUser', JSON.stringify(userData.user));
+            
+            // Обновляем сообщение
+            const messageEl = document.querySelector('.success-message');
+            if (messageEl) {
+              messageEl.textContent = 'Ваша подписка активирована! Теперь у вас есть доступ ко всем функциям платформы.';
+            }
+          }
+        } catch (error) {
+          console.error('Payment status check error:', error);
+        }
+      }
+    });
+  </script>
+</body>
+</html>
+

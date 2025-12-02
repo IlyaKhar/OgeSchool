@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>О платформе подготовки к ОГЭ 9 класса — OGE Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="theme.css">
+  <script src="js/theme.js"></script>
+  <link rel="stylesheet" href="global.css">
+  <link rel="stylesheet" href="components.css">
+  <link rel="stylesheet" href="auth.css">
+</head>
+<body>
+  <header class="site-header site-header-dark">
+    <div class="container nav">
+      <div class="logo">OGE</div>
+      <div class="nav-center">
+        <nav class="menu nav-pill">
+          <a href="index.html">Главная</a>
+          <a href="about.html">О нас</a>
+          <a href="pricing.html">Тарифы</a>
+          <a href="tasks.html">Карта заданий</a>
+          <a href="tasks-database.html">База заданий</a>
+          <a href="exams.html">Экзамены</a>
+        </nav>
+      </div>
+      <div class="actions">
+        <a href="#login" class="btn btn-ghost">Войти</a>
+        <a href="#signup" class="btn btn-primary">Попробовать</a>
+      </div>
+    </div>
+  </header>
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-text">
+          <div class="pill"><span class="badge">Миссия</span> Помогаем девятиклассникам спокойно сдать ОГЭ на 4–5</div>
+          <h1>О платформе подготовки к ОГЭ</h1>
+          <p>Мы объединили опыт учителей‑экспертов ОГЭ, методистов и инженеров, чтобы подготовка к экзамену была понятной, предсказуемой и без лишнего стресса.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="about-stats">
+          <div class="stat"><div class="num">50k+</div><div class="label">решённых заданий формата ОГЭ</div></div>
+          <div class="stat"><div class="num">4.8/5</div><div class="label">оценка девятиклассников</div></div>
+          <div class="stat"><div class="num">2+</div><div class="label">ключевых предмета ОГЭ (русский, математика)</div></div>
+        </div>
+        <div class="about-grid">
+          <div class="about-card">
+            <h3>Миссия</h3>
+            <p>Помочь каждому ученику 9 класса уверенно выйти на свои 4–5 по ОГЭ, не перегорев и не потеряв интерес к учёбе.</p>
+          </div>
+          <div class="about-card">
+            <h3>Подход</h3>
+            <p>Короткие объяснения под школьную программу, тренажёры по номерам заданий ОГЭ, мгновенная проверка и понятная карта знаний.</p>
+          </div>
+          <div class="about-card">
+            <h3>Команда</h3>
+            <p>Учителя‑эксперты ОГЭ, методисты и инженеры. Мы регулярно обновляем базу заданий по официальным демоверсиям и интерфейс платформы.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section faq">
+      <div class="container">
+        <h2>FAQ</h2>
+        <div class="faq-list">
+          <details>
+            <summary>Как начать готовиться к ОГЭ?</summary>
+            <p>Зарегистрируйтесь, выберите предметы ОГЭ и пройдите диагностику. Платформа предложит персональный план подготовки.</p>
+          </details>
+          <details>
+            <summary>Сколько стоит подготовка?</summary>
+            <p>Есть бесплатный стартовый доступ. Платные тарифы с ежемесячной оплатой и выгодными пакетами до экзамена.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <div class="logo">OGE</div>
+        <p class="muted">© 2025 OGE Platform</p>
+      </div>
+      <div>
+        <h4>Продукт</h4>
+        <a href="index.html#features">Возможности</a>
+        <a href="pricing.html">Тарифы</a>
+        <a href="#">Безопасность</a>
+      </div>
+      <div>
+        <h4>Ресурсы</h4>
+        <a href="#">Документация</a>
+        <a href="#">Блог</a>
+        <a href="#">Помощь</a>
+      </div>
+      <div>
+        <h4>Компания</h4>
+        <a href="about.html">О нас</a>
+        <a href="#">Контакты</a>
+      </div>
+    </div>
+  </footer>
+  <!-- Модальные окна для аутентификации -->
+  <div id="loginModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Вход в систему</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <form id="loginForm" class="auth-form">
+        <div class="form-group">
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" name="email" required>
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">Пароль</label>
+          <input type="password" id="loginPassword" name="password" required>
+        </div>
+        <div class="captcha-container">
+          <!-- Капча будет сгенерирована через JavaScript -->
+        </div>
+        <button type="submit" class="auth-btn auth-btn-primary">Войти</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="signupModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Регистрация</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <form id="signupForm" class="auth-form">
+        <div class="form-group">
+          <label for="signupFirstName">Имя</label>
+          <input type="text" id="signupFirstName" name="firstName" required>
+        </div>
+        <div class="form-group">
+          <label for="signupLastName">Фамилия</label>
+          <input type="text" id="signupLastName" name="lastName" required>
+        </div>
+        <div class="form-group">
+          <label for="signupEmail">Email</label>
+          <input type="email" id="signupEmail" name="email" required>
+        </div>
+        <div class="form-group">
+          <label for="signupPhone">Номер телефона</label>
+          <input type="tel" id="signupPhone" name="phone" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="signupAge">Возраст</label>
+            <input type="number" id="signupAge" name="age" min="14" max="18" required>
+          </div>
+          <div class="form-group">
+            <label for="signupGrade">Класс</label>
+            <select id="signupGrade" name="grade" required>
+              <option value="">Выберите класс</option>
+              <option value="9">9 класс</option>
+              <option value="10">10 класс</option>
+              <option value="11">11 класс</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="signupPassword">Пароль</label>
+          <input type="password" id="signupPassword" name="password" required>
+        </div>
+        <div class="captcha-container">
+          <!-- Капча будет сгенерирована через JavaScript -->
+        </div>
+        <button type="submit" class="auth-btn auth-btn-primary">Зарегистрироваться</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/api-client.js"></script>
+  <script src="main.js"></script>
+  <script src="auth.js"></script>
+</body>
+</html>
+
