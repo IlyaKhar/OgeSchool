@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
@@ -53,15 +54,28 @@ const aiLimiter = rateLimit({
   message: { error: 'Слишком много AI-запросов. Попробуйте чуть позже.' }
 });
 
+// Определяем путь к статическим файлам (на Vercel это корень проекта)
+const staticPath = path.join(__dirname, '..');
+
 // Статика (фронтенд лежит в корне проекта)
-app.use(express.static('.', {
+app.use(express.static(staticPath, {
   index: 'index.html',
   extensions: ['html', 'js', 'css', 'json', 'png', 'jpg', 'ico']
 }));
 
-// Обработка корневого пути
+// Обработка корневого пути и всех HTML страниц
 app.get('/', (req, res) => {
-  res.sendFile('index.html', { root: '.' });
+  res.sendFile(path.join(staticPath, 'index.html'));
+});
+
+// Обработка других HTML страниц
+app.get('*.html', (req, res) => {
+  const filePath = path.join(staticPath, req.path);
+  res.sendFile(filePath, (err) => {
+    if (err) {
+      res.status(404).send('File not found');
+    }
+  });
 });
 
 // Маршруты API (важно: более специфичные пути должны быть выше общих)
