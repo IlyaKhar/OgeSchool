@@ -870,7 +870,8 @@ class DatabaseManager {
     }
 
     // Получение всех задач (для админки)
-    getAllTasks(limit = 100, offset = 0, filters = {}) {
+    async getAllTasks(limit = 100, offset = 0, filters = {}) {
+        await this.ensureInit();
         try {
             let query = `
                 SELECT t.*, s.name as subject_name, tp.name as topic_name
@@ -958,7 +959,8 @@ class DatabaseManager {
     }
 
     // Получение всех вариантов (для админки, включая неопубликованные)
-    getAllTestVariants(subjectId = null) {
+    async getAllTestVariants(subjectId = null) {
+        await this.ensureInit();
         try {
             let query = `
                 SELECT tv.*, s.name as subject_name
