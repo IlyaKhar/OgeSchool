@@ -23,8 +23,9 @@ class DatabaseManager {
             if (tursoUrl && tursoAuthToken) {
                 // Используем Turso (serverless SQLite)
                 try {
-                    const { createClient } = require('@libsql/client');
-                    this.db = createClient({
+                    // Используем serverless драйвер для Vercel
+                    const { connect } = require('@tursodatabase/serverless');
+                    this.db = connect({
                         url: tursoUrl,
                         authToken: tursoAuthToken
                     });
@@ -152,33 +153,15 @@ class DatabaseManager {
         await this.ensureInit();
         if (this.isTurso) {
             try {
-                const result = await this.db.execute({
-                    sql,
-                    args
-                });
-                // Turso возвращает rows как массив объектов
-                if (!result || !result.rows || !Array.isArray(result.rows)) {
+                // Serverless драйвер использует prepare().all()
+                const stmt = this.db.prepare(sql);
+                const rows = await stmt.all(args);
+                // Serverless драйвер возвращает объект с полем rows
+                if (!rows || !rows.rows || !Array.isArray(rows.rows)) {
                     return [];
                 }
-                return result.rows.map(row => {
-                    // Turso возвращает объекты напрямую, но нужно проверить формат
-                    if (typeof row === 'object' && row !== null) {
-                        const obj = {};
-                        // Если это Map или объект с методами, конвертируем
-                        if (row.entries && typeof row.entries === 'function') {
-                            for (const [key, value] of row.entries()) {
-                                obj[key] = value;
-                            }
-                        } else {
-                            // Обычный объект - используем Object.keys для надежности
-                            Object.keys(row).forEach(key => {
-                                obj[key] = row[key];
-                            });
-                        }
-                        return obj;
-                    }
-                    return row;
-                });
+                // rows.rows уже содержит объекты
+                return rows.rows;
             } catch (error) {
                 // Если таблица не существует, пытаемся создать таблицы и повторить
                 if (error.message && error.message.toLowerCase().includes('no such table')) {
@@ -187,20 +170,9 @@ class DatabaseManager {
                         this.tablesCreated = false; // Сбрасываем флаг
                         await this.ensureInit(); // Повторно создаем таблицы
                         // Повторяем запрос
-                        const result = await this.db.execute({ sql, args });
-                        if (!result || !result.rows || !Array.isArray(result.rows)) {
-                            return [];
-                        }
-                        return result.rows.map(row => {
-                            if (typeof row === 'object' && row !== null) {
-                                const obj = {};
-                                Object.keys(row).forEach(key => {
-                                    obj[key] = row[key];
-                                });
-                                return obj;
-                            }
-                            return row;
-                        });
+                        const stmt = this.db.prepare(sql);
+                        const rows = await stmt.all(args);
+                        return rows.rows || [];
                     }
                 }
                 console.error('Ошибка executeQuery (Turso):', error.message, 'SQL:', sql.substring(0, 100));
@@ -250,12 +222,9 @@ class DatabaseManager {
         await this.ensureInit();
         if (this.isTurso) {
             try {
-                const result = await this.db.execute({
-                    sql,
-                    args
-                });
-                // Turso возвращает lastInsertRowid в result.lastInsertRowid
-                return { lastInsertRowid: result.lastInsertRowid || result.rowsAffected || 0 };
+                const stmt = this.db.prepare(sql);
+                const result = await stmt.run(args);
+                return { lastInsertRowid: result.lastInsertRowid || result.meta?.last_insert_rowid || 0 };
             } catch (error) {
                 console.error('Ошибка executeInsert (Turso):', error.message, 'SQL:', sql.substring(0, 100));
                 throw error;
@@ -271,11 +240,9 @@ class DatabaseManager {
         await this.ensureInit();
         if (this.isTurso) {
             try {
-                const result = await this.db.execute({
-                    sql,
-                    args
-                });
-                return { changes: result.rowsAffected || 0 };
+                const stmt = this.db.prepare(sql);
+                const result = await stmt.run(args);
+                return { changes: result.meta?.rows_affected || result.changes || 0 };
             } catch (error) {
                 console.error('Ошибка executeUpdate (Turso):', error.message, 'SQL:', sql.substring(0, 100));
                 throw error;
