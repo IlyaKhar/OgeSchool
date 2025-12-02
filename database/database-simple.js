@@ -133,8 +133,9 @@ class DatabaseManager {
         const statements = schema
             .split(';')
             .map(s => s.trim())
-            .filter(s => s.length > 0 && !s.startsWith('--'));
+            .filter(s => s.length > 0 && !s.startsWith('--') && !s.toLowerCase().includes('index'));
         
+        let created = 0;
         for (const statement of statements) {
             try {
                 await this.db.execute(statement);
@@ -188,26 +189,9 @@ class DatabaseManager {
         await this.ensureInit();
         if (this.isTurso) {
             try {
-                const result = await this.db.execute({
-                    sql,
-                    args
-                });
-                if (!result.rows || result.rows.length === 0) return null;
-                const row = result.rows[0];
-                if (typeof row === 'object' && row !== null) {
-                    const obj = {};
-                    if (row.entries) {
-                        for (const [key, value] of row.entries()) {
-                            obj[key] = value;
-                        }
-                    } else {
-                        for (const key in row) {
-                            obj[key] = row[key];
-                        }
-                    }
-                    return obj;
-                }
-                return row;
+                const stmt = this.db.prepare(sql);
+                const row = await stmt.get(args);
+                return row || null;
             } catch (error) {
                 console.error('Ошибка executeQueryOne (Turso):', error.message, 'SQL:', sql.substring(0, 100));
                 throw error;
