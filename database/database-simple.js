@@ -4,11 +4,23 @@ const path = require('path');
 class DatabaseManager {
     constructor() {
         this.db = null;
-        this.init();
+        this.initialized = false;
+        this.initError = null;
     }
 
     init() {
+        if (this.initialized) {
+            return;
+        }
+        
         try {
+            // На Vercel serverless лучше не использовать SQLite
+            if (process.env.VERCEL || process.env.NODE_ENV === 'production') {
+                console.log('SQLite отключен на serverless окружении, используем только MongoDB');
+                this.initialized = true;
+                return;
+            }
+            
             // Создаем папку database если её нет
             const dbPath = path.join(__dirname, 'tasks.db');
             this.db = new Database(dbPath);
@@ -21,9 +33,21 @@ class DatabaseManager {
             this.createTables();
             
             console.log('База данных инициализирована успешно');
+            this.initialized = true;
         } catch (error) {
-            console.error('Ошибка инициализации базы данных:', error);
-            throw error;
+            console.error('Ошибка инициализации базы данных:', error.message);
+            this.initError = error;
+            this.initialized = true;
+            // Не бросаем ошибку, чтобы приложение могло работать только с MongoDB
+        }
+    }
+    
+    ensureInit() {
+        if (!this.initialized) {
+            this.init();
+        }
+        if (this.initError || !this.db) {
+            throw new Error('SQLite недоступен. Используйте MongoDB для продакшена.');
         }
     }
 
@@ -46,6 +70,7 @@ class DatabaseManager {
      * Используется для связывания Mongo-пользователя с результатами тестов в SQLite.
      */
     ensureSqlUser(user) {
+        this.ensureInit();
         try {
             if (!user || !user.email) {
                 // Если email неизвестен, используем гостевого пользователя с id = 1
@@ -89,6 +114,7 @@ class DatabaseManager {
 
     // Методы для работы с предметами
     getSubjects() {
+        this.ensureInit();
         try {
             const stmt = this.db.prepare('SELECT * FROM subjects ORDER BY name');
             return Promise.resolve(stmt.all());
