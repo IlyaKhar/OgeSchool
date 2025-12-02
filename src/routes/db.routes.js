@@ -240,7 +240,7 @@ router.post('/test-results', authenticate, async (req, res) => {
     const mongoUser = req.user;
     let userId = null;
     try {
-      userId = db.ensureSqlUser(mongoUser);
+      userId = await db.ensureSqlUser(mongoUser);
     } catch (e) {
       console.warn('ensureSqlUser failed, будет использован гостевой пользователь:', e);
     }
@@ -306,7 +306,7 @@ router.post('/test-results', authenticate, async (req, res) => {
 // GET /api/users/:id/results - результаты пользователя (id из пути игнорируем, используем авторизацию)
 router.get('/users/:id/results', authenticate, async (req, res) => {
   try {
-    const sqliteUserId = db.ensureSqlUser(req.user);
+    const sqliteUserId = await db.ensureSqlUser(req.user);
     if (!sqliteUserId) {
       return res.status(500).json({ error: 'Не удалось сопоставить пользователя с локальной базой результатов' });
     }
@@ -324,7 +324,7 @@ router.get('/users/:id/results', authenticate, async (req, res) => {
 // GET /api/users/:id/progress - прогресс пользователя (id из пути игнорируем, используем авторизацию)
 router.get('/users/:id/progress', authenticate, async (req, res) => {
   try {
-    const sqliteUserId = db.ensureSqlUser(req.user);
+    const sqliteUserId = await db.ensureSqlUser(req.user);
     if (!sqliteUserId) {
       return res.status(500).json({ error: 'Не удалось сопоставить пользователя с локальной базой прогресса' });
     }

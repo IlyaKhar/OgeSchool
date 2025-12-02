@@ -131,50 +131,119 @@ class DatabaseManager {
         console.log('Таблицы созданы в Turso');
     }
 
+    // Helper методы для работы с обоими вариантами БД
+    async executeQuery(sql, args = []) {
+        await this.ensureInit();
+        if (this.isTurso) {
+            const result = await this.db.execute({
+                sql,
+                args
+            });
+            return result.rows.map(row => {
+                const obj = {};
+                for (const [key, value] of Object.entries(row)) {
+                    obj[key] = value;
+                }
+                return obj;
+            });
+        } else {
+            const stmt = this.db.prepare(sql);
+            return args.length > 0 ? stmt.all(...args) : stmt.all();
+        }
+    }
+    
+    async executeQueryOne(sql, args = []) {
+        await this.ensureInit();
+        if (this.isTurso) {
+            const result = await this.db.execute({
+                sql,
+                args
+            });
+            if (result.rows.length === 0) return null;
+            const row = result.rows[0];
+            const obj = {};
+            for (const [key, value] of Object.entries(row)) {
+                obj[key] = value;
+            }
+            return obj;
+        } else {
+            const stmt = this.db.prepare(sql);
+            return args.length > 0 ? stmt.get(...args) : stmt.get();
+        }
+    }
+    
+    async executeInsert(sql, args = []) {
+        await this.ensureInit();
+        if (this.isTurso) {
+            const result = await this.db.execute({
+                sql,
+                args
+            });
+            return { lastInsertRowid: result.lastInsertRowid || result.rowsAffected };
+        } else {
+            const stmt = this.db.prepare(sql);
+            const result = args.length > 0 ? stmt.run(...args) : stmt.run();
+            return { lastInsertRowid: result.lastInsertRowid };
+        }
+    }
+    
+    async executeUpdate(sql, args = []) {
+        await this.ensureInit();
+        if (this.isTurso) {
+            const result = await this.db.execute({
+                sql,
+                args
+            });
+            return { changes: result.rowsAffected || 0 };
+        } else {
+            const stmt = this.db.prepare(sql);
+            const result = args.length > 0 ? stmt.run(...args) : stmt.run();
+            return { changes: result.changes };
+        }
+    }
+
     // --- Вспомогательные методы для пользователей (SQLite) ---
     /**
      * Находит или создаёт SQLite-пользователя по email.
      * Используется для связывания Mongo-пользователя с результатами тестов в SQLite.
      */
-    ensureSqlUser(user) {
-        this.ensureInit();
+    async ensureSqlUser(user) {
+        await this.ensureInit();
         try {
             if (!user || !user.email) {
                 // Если email неизвестен, используем гостевого пользователя с id = 1
-                const guest = this.db.prepare('SELECT id FROM users WHERE id = 1').get();
+                const guest = await this.executeQueryOne('SELECT id FROM users WHERE id = 1');
                 if (guest) {
                     return guest.id;
                 }
-                const insertGuest = this.db.prepare(`
-                    INSERT INTO users (email, password_hash, first_name, last_name, grade)
-                    VALUES (?, ?, ?, ?, ?)
-                `);
-                const result = insertGuest.run('guest@example.com', 'guest', 'Гость', 'ОГЭ', 9);
+                const result = await this.executeInsert(
+                    `INSERT INTO users (email, password_hash, first_name, last_name, grade)
+                    VALUES (?, ?, ?, ?, ?)`,
+                    ['guest@example.com', 'guest', 'Гость', 'ОГЭ', 9]
+                );
                 return result.lastInsertRowid;
             }
 
-            const selectStmt = this.db.prepare('SELECT id FROM users WHERE email = ?');
-            const existing = selectStmt.get(user.email);
+            const existing = await this.executeQueryOne('SELECT id FROM users WHERE email = ?', [user.email]);
             if (existing) {
                 return existing.id;
             }
 
-            const insertStmt = this.db.prepare(`
-                INSERT INTO users (email, password_hash, first_name, last_name, age, grade)
-                VALUES (?, ?, ?, ?, ?, ?)
-            `);
-            const result = insertStmt.run(
-                user.email,
-                'external-auth', // фиктивный пароль, т.к. аутентификация идёт через MongoDB
-                user.firstName || 'Ученик',
-                user.lastName || 'ОГЭ',
-                user.age || null,
-                user.grade || 9
+            const result = await this.executeInsert(
+                `INSERT INTO users (email, password_hash, first_name, last_name, age, grade)
+                VALUES (?, ?, ?, ?, ?, ?)`,
+                [
+                    user.email,
+                    'external-auth',
+                    user.firstName || 'Ученик',
+                    user.lastName || 'ОГЭ',
+                    user.age || null,
+                    user.grade || 9
+                ]
             );
             return result.lastInsertRowid;
         } catch (err) {
             console.error('ensureSqlUser error:', err);
-            // В крайнем случае не падаем, а возвращаем null — выше решим, что делать
             return null;
         }
     }
@@ -254,38 +323,41 @@ class DatabaseManager {
         }
     }
 
-    addTopic(subjectId, name, description, orderIndex = 0) {
+    async addTopic(subjectId, name, description, orderIndex = 0) {
+        await this.ensureInit();
         try {
-            const stmt = this.db.prepare(`
-                INSERT INTO topics (subject_id, name, description, order_index) 
-                VALUES (?, ?, ?, ?)
-            `);
-            const result = stmt.run(subjectId, name, description, orderIndex);
-            return Promise.resolve({ lastInsertRowid: result.lastInsertRowid });
+            const result = await this.executeInsert(
+                `INSERT INTO topics (subject_id, name, description, order_index) 
+                VALUES (?, ?, ?, ?)`,
+                [subjectId, name, description, orderIndex]
+            );
+            return result;
         } catch (err) {
-            return Promise.reject(err);
+            throw err;
         }
     }
 
     // Методы для работы с заданиями
-    getTasksByTopic(topicId, limit = 50, offset = 0) {
+    async getTasksByTopic(topicId, limit = 50, offset = 0) {
+        await this.ensureInit();
         try {
-            const stmt = this.db.prepare(`
-                SELECT t.*, s.name as subject_name, tp.name as topic_name
+            return await this.executeQuery(
+                `SELECT t.*, s.name as subject_name, tp.name as topic_name
                 FROM tasks t
                 LEFT JOIN subjects s ON t.subject_id = s.id
                 LEFT JOIN topics tp ON t.topic_id = tp.id
                 WHERE t.topic_id = ?
                 ORDER BY t.difficulty_level, t.id
-                LIMIT ? OFFSET ?
-            `);
-            return Promise.resolve(stmt.all(topicId, limit, offset));
+                LIMIT ? OFFSET ?`,
+                [topicId, limit, offset]
+            );
         } catch (err) {
-            return Promise.reject(err);
+            throw err;
         }
     }
 
-    getTasksBySubject(subjectId, difficultyLevel = null, limit = 50, offset = 0) {
+    async getTasksBySubject(subjectId, difficultyLevel = null, limit = 50, offset = 0) {
+        await this.ensureInit();
         try {
             let query = `
                 SELECT t.*, s.name as subject_name, tp.name as topic_name
@@ -304,66 +376,67 @@ class DatabaseManager {
             query += ' ORDER BY t.difficulty_level, t.id LIMIT ? OFFSET ?';
             params.push(limit, offset);
 
-            const stmt = this.db.prepare(query);
-            return Promise.resolve(stmt.all(...params));
+            return await this.executeQuery(query, params);
         } catch (err) {
-            return Promise.reject(err);
+            throw err;
         }
     }
 
-    getTaskById(taskId) {
+    async getTaskById(taskId) {
+        await this.ensureInit();
         try {
-            const stmt = this.db.prepare(`
-                SELECT t.*, s.name as subject_name, tp.name as topic_name
+            return await this.executeQueryOne(
+                `SELECT t.*, s.name as subject_name, tp.name as topic_name
                 FROM tasks t
                 LEFT JOIN subjects s ON t.subject_id = s.id
                 LEFT JOIN topics tp ON t.topic_id = tp.id
-                WHERE t.id = ?
-            `);
-            return Promise.resolve(stmt.get(taskId));
+                WHERE t.id = ?`,
+                [taskId]
+            );
         } catch (err) {
-            return Promise.reject(err);
+            throw err;
         }
     }
 
-    addTask(taskData) {
+    async addTask(taskData) {
+        await this.ensureInit();
         try {
-            const stmt = this.db.prepare(`
-                INSERT INTO tasks (
+            const result = await this.executeInsert(
+                `INSERT INTO tasks (
                     subject_id, topic_id, task_type, difficulty_level, points,
                     question_text, question_image_url, correct_answer, explanation, solution_steps
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            `);
-            
-            const result = stmt.run(
-                taskData.subjectId,
-                taskData.topicId,
-                taskData.taskType,
-                taskData.difficultyLevel,
-                taskData.points,
-                taskData.questionText,
-                taskData.questionImageUrl,
-                taskData.correctAnswer,
-                taskData.explanation,
-                JSON.stringify(taskData.solutionSteps)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                [
+                    taskData.subjectId,
+                    taskData.topicId,
+                    taskData.taskType,
+                    taskData.difficultyLevel,
+                    taskData.points,
+                    taskData.questionText,
+                    taskData.questionImageUrl,
+                    taskData.correctAnswer,
+                    taskData.explanation,
+                    JSON.stringify(taskData.solutionSteps)
+                ]
             );
-            return Promise.resolve({ lastInsertRowid: result.lastInsertRowid });
+            return result;
         } catch (err) {
-            return Promise.reject(err);
+            throw err;
         }
     }
 
     // Методы для работы с вариантами ответов
-    getAnswerOptions(taskId) {
+    async getAnswerOptions(taskId) {
+        await this.ensureInit();
         try {
-            const stmt = this.db.prepare(`
-                SELECT * FROM answer_options 
+            return await this.executeQuery(
+                `SELECT * FROM answer_options 
                 WHERE task_id = ? 
-                ORDER BY order_index
-            `);
-            return Promise.resolve(stmt.all(taskId));
+                ORDER BY order_index`,
+                [taskId]
+            );
         } catch (err) {
-            return Promise.reject(err);
+            throw err;
         }
     }
 
@@ -398,41 +471,42 @@ class DatabaseManager {
 
             query += ' ORDER BY tv.created_at DESC';
 
-            const stmt = this.db.prepare(query);
-            return Promise.resolve(stmt.all(...params));
+            return await this.executeQuery(query, params);
         } catch (err) {
-            return Promise.reject(err);
+            throw err;
         }
     }
 
-    getVariantById(variantId) {
+    async getVariantById(variantId) {
+        await this.ensureInit();
         try {
-            const stmt = this.db.prepare(`
-                SELECT tv.*, s.name as subject_name
+            return await this.executeQueryOne(
+                `SELECT tv.*, s.name as subject_name
                 FROM test_variants tv
                 LEFT JOIN subjects s ON tv.subject_id = s.id
-                WHERE tv.id = ?
-            `);
-            return Promise.resolve(stmt.get(variantId));
+                WHERE tv.id = ?`,
+                [variantId]
+            );
         } catch (err) {
-            return Promise.reject(err);
+            throw err;
         }
     }
 
-    getVariantTasks(variantId) {
+    async getVariantTasks(variantId) {
+        await this.ensureInit();
         try {
-            const stmt = this.db.prepare(`
-                SELECT vt.*, t.*, s.name as subject_name, tp.name as topic_name
+            return await this.executeQuery(
+                `SELECT vt.*, t.*, s.name as subject_name, tp.name as topic_name
                 FROM variant_tasks vt
                 JOIN tasks t ON vt.task_id = t.id
                 LEFT JOIN subjects s ON t.subject_id = s.id
                 LEFT JOIN topics tp ON t.topic_id = tp.id
                 WHERE vt.variant_id = ?
-                ORDER BY vt.task_number
-            `);
-            return Promise.resolve(stmt.all(variantId));
+                ORDER BY vt.task_number`,
+                [variantId]
+            );
         } catch (err) {
-            return Promise.reject(err);
+            throw err;
         }
     }
 
@@ -469,91 +543,95 @@ class DatabaseManager {
     }
 
     // Методы для генерации случайных вариантов
-    generateRandomVariant(subjectId, taskCount = 20, difficultyDistribution = {1: 4, 2: 6, 3: 6, 4: 3, 5: 1}) {
+    async generateRandomVariant(subjectId, taskCount = 20, difficultyDistribution = {1: 4, 2: 6, 3: 6, 4: 3, 5: 1}) {
+        await this.ensureInit();
         try {
             const tasks = [];
             
             // Получаем задания по уровням сложности
             for (const [level, count] of Object.entries(difficultyDistribution)) {
                 if (count > 0) {
-                    const stmt = this.db.prepare(`
-                        SELECT * FROM tasks 
+                    const levelTasks = await this.executeQuery(
+                        `SELECT * FROM tasks 
                         WHERE subject_id = ? AND difficulty_level = ? 
                         ORDER BY RANDOM() 
-                        LIMIT ?
-                    `);
-                    const levelTasks = stmt.all(subjectId, parseInt(level), count);
+                        LIMIT ?`,
+                        [subjectId, parseInt(level), count]
+                    );
                     tasks.push(...levelTasks);
                 }
             }
             
             // Перемешиваем задания
             const shuffledTasks = tasks.sort(() => Math.random() - 0.5);
-            return Promise.resolve(shuffledTasks.slice(0, taskCount));
+            return shuffledTasks.slice(0, taskCount);
         } catch (err) {
-            return Promise.reject(err);
+            throw err;
         }
     }
 
     // Методы для работы с результатами
-    saveTestResult(resultData) {
+    async saveTestResult(resultData) {
+        await this.ensureInit();
         try {
-            const stmt = this.db.prepare(`
-                INSERT INTO test_results (
+            const result = await this.executeInsert(
+                `INSERT INTO test_results (
                     user_id, variant_id, score, max_score, percentage, 
                     time_spent, completed_at, is_completed
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            `);
-            const result = stmt.run(
-                resultData.userId,
-                resultData.variantId,
-                resultData.score,
-                resultData.maxScore,
-                resultData.percentage,
-                resultData.timeSpent,
-                resultData.completedAt,
-                resultData.isCompleted
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+                [
+                    resultData.userId,
+                    resultData.variantId,
+                    resultData.score,
+                    resultData.maxScore,
+                    resultData.percentage,
+                    resultData.timeSpent,
+                    resultData.completedAt,
+                    resultData.isCompleted
+                ]
             );
-            return Promise.resolve({ lastInsertRowid: result.lastInsertRowid });
+            return result;
         } catch (err) {
-            return Promise.reject(err);
+            throw err;
         }
     }
 
-    saveUserAnswer(answerData) {
+    async saveUserAnswer(answerData) {
+        await this.ensureInit();
         try {
-            const stmt = this.db.prepare(`
-                INSERT INTO user_answers (
+            const result = await this.executeInsert(
+                `INSERT INTO user_answers (
                     test_result_id, task_id, user_answer, is_correct, points_earned
-                ) VALUES (?, ?, ?, ?, ?)
-            `);
-            const result = stmt.run(
-                answerData.testResultId,
-                answerData.taskId,
-                answerData.userAnswer,
-                answerData.isCorrect,
-                answerData.pointsEarned
+                ) VALUES (?, ?, ?, ?, ?)`,
+                [
+                    answerData.testResultId,
+                    answerData.taskId,
+                    answerData.userAnswer,
+                    answerData.isCorrect,
+                    answerData.pointsEarned
+                ]
             );
-            return Promise.resolve({ lastInsertRowid: result.lastInsertRowid });
+            return result;
         } catch (err) {
-            return Promise.reject(err);
+            throw err;
         }
     }
 
-    getUserResults(userId, limit = 10) {
+    async getUserResults(userId, limit = 10) {
+        await this.ensureInit();
         try {
-            const stmt = this.db.prepare(`
-                SELECT tr.*, tv.variant_name, s.name as subject_name
+            return await this.executeQuery(
+                `SELECT tr.*, tv.variant_name, s.name as subject_name
                 FROM test_results tr
                 JOIN test_variants tv ON tr.variant_id = tv.id
                 JOIN subjects s ON tv.subject_id = s.id
                 WHERE tr.user_id = ?
                 ORDER BY tr.completed_at DESC
-                LIMIT ?
-            `);
-            return Promise.resolve(stmt.all(userId, limit));
+                LIMIT ?`,
+                [userId, limit]
+            );
         } catch (err) {
-            return Promise.reject(err);
+            throw err;
         }
     }
 
@@ -574,7 +652,8 @@ class DatabaseManager {
         }
     }
 
-    getUserProgress(userId, subjectId = null) {
+    async getUserProgress(userId, subjectId = null) {
+        await this.ensureInit();
         try {
             let query = `
                 SELECT up.*, tp.name as topic_name, s.name as subject_name
@@ -592,63 +671,60 @@ class DatabaseManager {
 
             query += ' ORDER BY up.last_activity DESC';
 
-            const stmt = this.db.prepare(query);
-            return Promise.resolve(stmt.all(...params));
+            return await this.executeQuery(query, params);
         } catch (err) {
-            return Promise.reject(err);
+            throw err;
         }
     }
 
     /**
      * Обновляет прогресс пользователя по теме
      */
-    updateUserProgress(userId, topicId, isCorrect = false) {
+    async updateUserProgress(userId, topicId, isCorrect = false) {
+        await this.ensureInit();
         try {
-            // Проверяем, есть ли уже запись о прогрессе
-            const existing = this.db.prepare(`
-                SELECT * FROM user_progress 
-                WHERE user_id = ? AND topic_id = ?
-            `).get(userId, topicId);
+            const existing = await this.executeQueryOne(
+                `SELECT * FROM user_progress 
+                WHERE user_id = ? AND topic_id = ?`,
+                [userId, topicId]
+            );
 
             if (existing) {
-                // Обновляем существующую запись
                 const newCompleted = existing.tasks_completed + 1;
                 const newCorrect = isCorrect ? existing.tasks_correct + 1 : existing.tasks_correct;
                 const newAverage = newCorrect / newCompleted;
 
-                const stmt = this.db.prepare(`
-                    UPDATE user_progress 
+                await this.executeUpdate(
+                    `UPDATE user_progress 
                     SET tasks_completed = ?,
                         tasks_correct = ?,
                         average_score = ?,
                         last_activity = CURRENT_TIMESTAMP
-                    WHERE user_id = ? AND topic_id = ?
-                `);
-                
-                stmt.run(newCompleted, newCorrect, newAverage, userId, topicId);
+                    WHERE user_id = ? AND topic_id = ?`,
+                    [newCompleted, newCorrect, newAverage, userId, topicId]
+                );
             } else {
-                // Создаем новую запись
-                const stmt = this.db.prepare(`
-                    INSERT INTO user_progress (user_id, topic_id, tasks_completed, tasks_correct, average_score, last_activity)
-                    VALUES (?, ?, 1, ?, ?, CURRENT_TIMESTAMP)
-                `);
-                
-                stmt.run(userId, topicId, isCorrect ? 1 : 0, isCorrect ? 1.0 : 0.0);
+                await this.executeInsert(
+                    `INSERT INTO user_progress (user_id, topic_id, tasks_completed, tasks_correct, average_score, last_activity)
+                    VALUES (?, ?, 1, ?, ?, CURRENT_TIMESTAMP)`,
+                    [userId, topicId, isCorrect ? 1 : 0, isCorrect ? 1.0 : 0.0]
+                );
             }
 
-            return Promise.resolve({ success: true });
+            return { success: true };
         } catch (err) {
-            return Promise.reject(err);
+            throw err;
         }
     }
 
     // --- Админские методы для CRUD ---
 
     // Обновление задачи
-    updateTask(taskId, taskData) {
+    async updateTask(taskId, taskData) {
+        await this.ensureInit();
         try {
-            const stmt = this.db.prepare(`
-                UPDATE tasks SET
+            await this.executeUpdate(
+                `UPDATE tasks SET
                     subject_id = ?,
                     topic_id = ?,
                     task_type = ?,
@@ -660,76 +736,70 @@ class DatabaseManager {
                     explanation = ?,
                     solution_steps = ?,
                     updated_at = CURRENT_TIMESTAMP
-                WHERE id = ?
-            `);
-            
-            stmt.run(
-                taskData.subjectId,
-                taskData.topicId,
-                taskData.taskType,
-                taskData.difficultyLevel,
-                taskData.points,
-                taskData.questionText,
-                taskData.questionImageUrl || null,
-                taskData.correctAnswer,
-                taskData.explanation || null,
-                taskData.solutionSteps ? JSON.stringify(taskData.solutionSteps) : null,
-                taskId
+                WHERE id = ?`,
+                [
+                    taskData.subjectId,
+                    taskData.topicId,
+                    taskData.taskType,
+                    taskData.difficultyLevel,
+                    taskData.points,
+                    taskData.questionText,
+                    taskData.questionImageUrl || null,
+                    taskData.correctAnswer,
+                    taskData.explanation || null,
+                    taskData.solutionSteps ? JSON.stringify(taskData.solutionSteps) : null,
+                    taskId
+                ]
             );
-            return Promise.resolve({ success: true });
+            return { success: true };
         } catch (err) {
-            return Promise.reject(err);
+            throw err;
         }
     }
 
     // Удаление задачи
-    deleteTask(taskId) {
+    async deleteTask(taskId) {
+        await this.ensureInit();
         try {
-            // Сначала удаляем варианты ответов (каскадное удаление)
-            const deleteOptionsStmt = this.db.prepare('DELETE FROM answer_options WHERE task_id = ?');
-            deleteOptionsStmt.run(taskId);
-            
-            // Удаляем задачу
-            const deleteTaskStmt = this.db.prepare('DELETE FROM tasks WHERE id = ?');
-            deleteTaskStmt.run(taskId);
-            
-            return Promise.resolve({ success: true });
+            await this.executeUpdate('DELETE FROM answer_options WHERE task_id = ?', [taskId]);
+            await this.executeUpdate('DELETE FROM tasks WHERE id = ?', [taskId]);
+            return { success: true };
         } catch (err) {
-            return Promise.reject(err);
+            throw err;
         }
     }
 
     // Обновление темы
-    updateTopic(topicId, topicData) {
+    async updateTopic(topicId, topicData) {
+        await this.ensureInit();
         try {
-            const stmt = this.db.prepare(`
-                UPDATE topics SET
+            await this.executeUpdate(
+                `UPDATE topics SET
                     name = ?,
                     description = ?,
                     order_index = ?
-                WHERE id = ?
-            `);
-            
-            stmt.run(
-                topicData.name,
-                topicData.description || null,
-                topicData.orderIndex || 0,
-                topicId
+                WHERE id = ?`,
+                [
+                    topicData.name,
+                    topicData.description || null,
+                    topicData.orderIndex || 0,
+                    topicId
+                ]
             );
-            return Promise.resolve({ success: true });
+            return { success: true };
         } catch (err) {
-            return Promise.reject(err);
+            throw err;
         }
     }
 
     // Удаление темы
-    deleteTopic(topicId) {
+    async deleteTopic(topicId) {
+        await this.ensureInit();
         try {
-            const stmt = this.db.prepare('DELETE FROM topics WHERE id = ?');
-            stmt.run(topicId);
-            return Promise.resolve({ success: true });
+            await this.executeUpdate('DELETE FROM topics WHERE id = ?', [topicId]);
+            return { success: true };
         } catch (err) {
-            return Promise.reject(err);
+            throw err;
         }
     }
 
@@ -765,15 +835,15 @@ class DatabaseManager {
             query += ' ORDER BY t.created_at DESC LIMIT ? OFFSET ?';
             params.push(limit, offset);
 
-            const stmt = this.db.prepare(query);
-            return Promise.resolve(stmt.all(...params));
+            return await this.executeQuery(query, params);
         } catch (err) {
-            return Promise.reject(err);
+            throw err;
         }
     }
 
     // Получение всех тем (для админки)
-    getAllTopics(subjectId = null) {
+    async getAllTopics(subjectId = null) {
+        await this.ensureInit();
         try {
             let query = `
                 SELECT t.*, s.name as subject_name
@@ -789,42 +859,35 @@ class DatabaseManager {
 
             query += ' ORDER BY t.order_index, t.name';
 
-            const stmt = this.db.prepare(query);
-            return Promise.resolve(stmt.all(...params));
+            return await this.executeQuery(query, params);
         } catch (err) {
-            return Promise.reject(err);
+            throw err;
         }
     }
 
     // Обновление вариантов ответов (удаляет старые и создаёт новые)
-    updateAnswerOptions(taskId, options) {
+    async updateAnswerOptions(taskId, options) {
+        await this.ensureInit();
         try {
-            const transaction = this.db.transaction(() => {
-                // Удаляем старые варианты
-                const deleteStmt = this.db.prepare('DELETE FROM answer_options WHERE task_id = ?');
-                deleteStmt.run(taskId);
-
-                // Добавляем новые варианты
-                const insertStmt = this.db.prepare(`
-                    INSERT INTO answer_options (task_id, option_text, option_image_url, is_correct, order_index)
-                    VALUES (?, ?, ?, ?, ?)
-                `);
-
-                options.forEach((opt, index) => {
-                    insertStmt.run(
+            await this.executeUpdate('DELETE FROM answer_options WHERE task_id = ?', [taskId]);
+            
+            for (const [index, opt] of options.entries()) {
+                await this.executeInsert(
+                    `INSERT INTO answer_options (task_id, option_text, option_image_url, is_correct, order_index)
+                    VALUES (?, ?, ?, ?, ?)`,
+                    [
                         taskId,
                         opt.optionText,
                         opt.optionImageUrl || null,
                         opt.isCorrect ? 1 : 0,
                         opt.orderIndex !== undefined ? opt.orderIndex : index
-                    );
-                });
-            });
-
-            transaction();
-            return Promise.resolve({ success: true });
+                    ]
+                );
+            }
+            
+            return { success: true };
         } catch (err) {
-            return Promise.reject(err);
+            throw err;
         }
     }
 
@@ -846,81 +909,61 @@ class DatabaseManager {
 
             query += ' ORDER BY tv.created_at DESC';
 
-            const stmt = this.db.prepare(query);
-            return Promise.resolve(stmt.all(...params));
+            return await this.executeQuery(query, params);
         } catch (err) {
-            return Promise.reject(err);
+            throw err;
         }
     }
 
     // Обновление варианта
-    updateTestVariant(variantId, variantData) {
+    async updateTestVariant(variantId, variantData) {
+        await this.ensureInit();
         try {
-            const stmt = this.db.prepare(`
-                UPDATE test_variants SET
+            await this.executeUpdate(
+                `UPDATE test_variants SET
                     subject_id = ?,
                     variant_name = ?,
                     description = ?,
                     total_points = ?,
                     time_limit = ?,
                     is_published = ?
-                WHERE id = ?
-            `);
-            
-            stmt.run(
-                variantData.subjectId,
-                variantData.variantName,
-                variantData.description || null,
-                variantData.totalPoints || 0,
-                variantData.timeLimit || null,
-                variantData.isPublished ? 1 : 0,
-                variantId
+                WHERE id = ?`,
+                [
+                    variantData.subjectId,
+                    variantData.variantName,
+                    variantData.description || null,
+                    variantData.totalPoints || 0,
+                    variantData.timeLimit || null,
+                    variantData.isPublished ? 1 : 0,
+                    variantId
+                ]
             );
-            return Promise.resolve({ success: true });
+            return { success: true };
         } catch (err) {
-            return Promise.reject(err);
+            throw err;
         }
     }
 
     // Удаление варианта
-    deleteTestVariant(variantId) {
+    async deleteTestVariant(variantId) {
+        await this.ensureInit();
         try {
-            // Удаляем связи с задачами
-            const deleteVariantTasksStmt = this.db.prepare('DELETE FROM variant_tasks WHERE variant_id = ?');
-            deleteVariantTasksStmt.run(variantId);
-            
-            // Удаляем вариант
-            const deleteVariantStmt = this.db.prepare('DELETE FROM test_variants WHERE id = ?');
-            deleteVariantStmt.run(variantId);
-            
-            return Promise.resolve({ success: true });
+            await this.executeUpdate('DELETE FROM variant_tasks WHERE variant_id = ?', [variantId]);
+            await this.executeUpdate('DELETE FROM test_variants WHERE id = ?', [variantId]);
+            return { success: true };
         } catch (err) {
-            return Promise.reject(err);
-        }
-    }
-
-    // Добавление задачи в вариант
-    addTaskToVariant(variantId, taskId, taskNumber, points = 1) {
-        try {
-            const stmt = this.db.prepare(`
-                INSERT INTO variant_tasks (variant_id, task_id, task_number, points)
-                VALUES (?, ?, ?, ?)
-            `);
-            const result = stmt.run(variantId, taskId, taskNumber, points);
-            return Promise.resolve({ lastInsertRowid: result.lastInsertRowid });
-        } catch (err) {
-            return Promise.reject(err);
+            throw err;
         }
     }
 
     // Удаление задачи из варианта
-    removeTaskFromVariant(variantId, taskId) {
+    async removeTaskFromVariant(variantId, taskId) {
+        await this.ensureInit();
         try {
-            const stmt = this.db.prepare('DELETE FROM variant_tasks WHERE variant_id = ? AND task_id = ?');
-            stmt.run(variantId, taskId);
-            return Promise.resolve({ success: true });
+            await this.executeUpdate('DELETE FROM variant_tasks WHERE variant_id = ? AND task_id = ?', [variantId, taskId]);
+            return { success: true };
         } catch (err) {
-            return Promise.reject(err);
+            throw err;
         }
     }
 
