@@ -70,24 +70,44 @@ app.use((req, res, next) => {
   }
   // Логируем запросы к статике
   if (req.path.match(/\.(css|js|png|jpg|ico|svg)$/)) {
-    console.log('Static file request:', req.path);
+    const filePath = path.join(staticPath, req.path);
+    const fs = require('fs');
+    const exists = fs.existsSync(filePath);
+    console.log('Static file request:', req.path, 'exists:', exists, 'path:', filePath);
   }
   next();
 });
 
-// Статика для всех файлов (CSS, JS, изображения и т.д.)
-// Важно: это должно быть ПЕРЕД API роутами
-app.use(express.static(staticPath, {
-  setHeaders: (res, filePath) => {
-    if (filePath.endsWith('.css')) {
-      res.type('text/css');
-      res.removeHeader('X-Content-Type-Options'); // Убираем nosniff для CSS
-    } else if (filePath.endsWith('.js')) {
-      res.type('application/javascript');
-      res.removeHeader('X-Content-Type-Options'); // Убираем nosniff для JS
-    }
+// Явная обработка CSS файлов
+app.get('*.css', (req, res, next) => {
+  const filePath = path.join(staticPath, req.path);
+  const fs = require('fs');
+  if (fs.existsSync(filePath)) {
+    res.type('text/css');
+    res.removeHeader('X-Content-Type-Options');
+    res.sendFile(filePath);
+  } else {
+    console.error('CSS file not found:', filePath);
+    next();
   }
-}));
+});
+
+// Явная обработка JS файлов
+app.get('*.js', (req, res, next) => {
+  const filePath = path.join(staticPath, req.path);
+  const fs = require('fs');
+  if (fs.existsSync(filePath)) {
+    res.type('application/javascript');
+    res.removeHeader('X-Content-Type-Options');
+    res.sendFile(filePath);
+  } else {
+    console.error('JS file not found:', filePath);
+    next();
+  }
+});
+
+// Статика для остальных файлов (изображения, шрифты и т.д.)
+app.use(express.static(staticPath));
 
 // Обработка корневого пути
 app.get('/', (req, res) => {
