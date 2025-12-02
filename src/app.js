@@ -24,7 +24,8 @@ connectDB().catch(console.error);
 app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
   contentSecurityPolicy: false, // Отключаем CSP для статических файлов
-  crossOriginEmbedderPolicy: false
+  crossOriginEmbedderPolicy: false,
+  xContentTypeOptions: false // Отключаем nosniff для статических файлов
 }));
 
 // CORS: для продакшена сюда можно поставить домен вместо true
@@ -59,6 +60,20 @@ const aiLimiter = rateLimit({
 // Определяем путь к статическим файлам (на Vercel это корень проекта)
 const staticPath = path.join(__dirname, '..');
 console.log('Static files path:', staticPath);
+console.log('__dirname:', __dirname);
+
+// Middleware для логирования запросов к статике (только для отладки)
+app.use((req, res, next) => {
+  // Пропускаем API запросы
+  if (req.path.startsWith('/api')) {
+    return next();
+  }
+  // Логируем запросы к статике
+  if (req.path.match(/\.(css|js|png|jpg|ico|svg)$/)) {
+    console.log('Static file request:', req.path);
+  }
+  next();
+});
 
 // Статика для всех файлов (CSS, JS, изображения и т.д.)
 // Важно: это должно быть ПЕРЕД API роутами
@@ -66,8 +81,10 @@ app.use(express.static(staticPath, {
   setHeaders: (res, filePath) => {
     if (filePath.endsWith('.css')) {
       res.type('text/css');
+      res.removeHeader('X-Content-Type-Options'); // Убираем nosniff для CSS
     } else if (filePath.endsWith('.js')) {
       res.type('application/javascript');
+      res.removeHeader('X-Content-Type-Options'); // Убираем nosniff для JS
     }
   }
 }));
