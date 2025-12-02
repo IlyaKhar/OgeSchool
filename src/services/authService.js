@@ -1,5 +1,28 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { mongoose } = require('../config/database');
+
+// Функция для ожидания подключения MongoDB
+const waitForConnection = async (maxWait = 5000) => {
+  if (mongoose.connection.readyState === 1) {
+    return true;
+  }
+  
+  return new Promise((resolve) => {
+    const startTime = Date.now();
+    const checkConnection = () => {
+      if (mongoose.connection.readyState === 1) {
+        resolve(true);
+      } else if (Date.now() - startTime > maxWait) {
+        console.warn('MongoDB connection timeout, proceeding anyway');
+        resolve(false);
+      } else {
+        setTimeout(checkConnection, 100);
+      }
+    };
+    checkConnection();
+  });
+};
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'your-refresh-secret-key-change-in-production';
@@ -55,6 +78,9 @@ const verifyRefreshToken = (token) => {
  */
 const registerUser = async (userData) => {
   try {
+    // Ждем подключения MongoDB (если еще не подключена)
+    await waitForConnection(3000);
+    
     // Проверяем, существует ли пользователь
     const existingUser = await User.findOne({ email: userData.email });
     if (existingUser) {
@@ -98,6 +124,9 @@ const registerUser = async (userData) => {
  */
 const loginUser = async (email, password) => {
   try {
+    // Ждем подключения MongoDB (если еще не подключена)
+    await waitForConnection(3000);
+    
     // Находим пользователя
     const user = await User.findOne({ email });
     if (!user) {
