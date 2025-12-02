@@ -54,7 +54,15 @@ const aiLimiter = rateLimit({
 });
 
 // Статика (фронтенд лежит в корне проекта)
-app.use(express.static('.'));
+app.use(express.static('.', {
+  index: 'index.html',
+  extensions: ['html', 'js', 'css', 'json', 'png', 'jpg', 'ico']
+}));
+
+// Обработка корневого пути
+app.get('/', (req, res) => {
+  res.sendFile('index.html', { root: '.' });
+});
 
 // Маршруты API (важно: более специфичные пути должны быть выше общих)
 app.use('/api/auth', authLimiter, authRoutes); // авторизация /register /login /refresh /logout /me
