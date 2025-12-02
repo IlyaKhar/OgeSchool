@@ -317,20 +317,9 @@ class DatabaseManager {
     async getSubjects() {
         await this.ensureInit();
         try {
-            if (this.isTurso) {
-                const result = await this.db.execute('SELECT * FROM subjects ORDER BY name');
-                return result.rows.map(row => {
-                    const obj = {};
-                    for (const [key, value] of Object.entries(row)) {
-                        obj[key] = value;
-                    }
-                    return obj;
-                });
-            } else {
-                const stmt = this.db.prepare('SELECT * FROM subjects ORDER BY name');
-                return stmt.all();
-            }
+            return await this.executeQuery('SELECT * FROM subjects ORDER BY name');
         } catch (err) {
+            console.error('Error in getSubjects:', err);
             throw err;
         }
     }
@@ -537,8 +526,10 @@ class DatabaseManager {
 
             query += ' ORDER BY tv.created_at DESC';
 
-            return await this.executeQuery(query, params);
+            const results = await this.executeQuery(query, params);
+            return results;
         } catch (err) {
+            console.error('Error in getTestVariants:', err);
             throw err;
         }
     }

@@ -18,7 +18,11 @@ router.get('/subjects', async (req, res) => {
     res.json({ subjects });
   } catch (error) {
     console.error('Error fetching subjects:', error);
-    res.status(500).json({ error: 'Ошибка получения предметов' });
+    console.error('Error stack:', error.stack);
+    res.status(500).json({ 
+      error: 'Ошибка получения предметов',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 });
 
