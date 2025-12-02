@@ -58,66 +58,20 @@ const aiLimiter = rateLimit({
 const staticPath = path.join(__dirname, '..');
 
 // Статика (фронтенд лежит в корне проекта)
-// Обрабатываем все статические файлы: CSS, JS, изображения и т.д.
-app.use(express.static(staticPath, {
-  index: false, // Отключаем автоматический index, обрабатываем вручную
-  extensions: ['html', 'js', 'css', 'json', 'png', 'jpg', 'jpeg', 'gif', 'svg', 'ico', 'woff', 'woff2', 'ttf', 'eot']
-}));
-
-// Обработка CSS файлов
-app.get('*.css', (req, res) => {
-  const filePath = path.join(staticPath, req.path);
-  res.type('text/css');
-  res.sendFile(filePath, (err) => {
-    if (err) {
-      res.status(404).send('/* CSS file not found */');
-    }
-  });
-});
-
-// Обработка JS файлов
-app.get('*.js', (req, res) => {
-  const filePath = path.join(staticPath, req.path);
-  res.type('application/javascript');
-  res.sendFile(filePath, (err) => {
-    if (err) {
-      res.status(404).send('// JS file not found');
-    }
-  });
-});
-
-// Обработка файлов в папке js/
-app.get('/js/*', (req, res) => {
-  const filePath = path.join(staticPath, req.path);
-  res.type('application/javascript');
-  res.sendFile(filePath, (err) => {
-    if (err) {
-      res.status(404).send('// JS file not found');
-    }
-  });
-});
-
-// Обработка файлов в папке css/
-app.get('/css/*', (req, res) => {
-  const filePath = path.join(staticPath, req.path);
-  res.type('text/css');
-  res.sendFile(filePath, (err) => {
-    if (err) {
-      res.status(404).send('/* CSS file not found */');
-    }
-  });
-});
+// express.static обрабатывает все статические файлы: CSS, JS, изображения и т.д.
+app.use(express.static(staticPath));
 
 // Обработка корневого пути
 app.get('/', (req, res) => {
   res.sendFile(path.join(staticPath, 'index.html'));
 });
 
-// Обработка других HTML страниц
+// Обработка HTML страниц (должно быть после express.static, но до API роутов)
 app.get('*.html', (req, res) => {
   const filePath = path.join(staticPath, req.path);
   res.sendFile(filePath, (err) => {
     if (err) {
+      console.error('HTML file not found:', req.path, err.message);
       res.status(404).send('File not found');
     }
   });
