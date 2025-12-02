@@ -17,7 +17,11 @@ const adminRoutes = require('./routes/admin.routes');
 const app = express();
 
 // Подключение к MongoDB (если доступна)
-connectDB().catch(console.error);
+// На Vercel это может занять время, поэтому не блокируем запуск
+connectDB().catch((err) => {
+  console.error('Failed to connect to MongoDB:', err.message);
+  // Приложение продолжит работу, но без MongoDB функций
+});
 
 // Middleware
 // Базовая защита HTTP-заголовков
