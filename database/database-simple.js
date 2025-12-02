@@ -6,6 +6,7 @@ class DatabaseManager {
         this.db = null;
         this.initialized = false;
         this.initError = null;
+        this.isTurso = false;
     }
 
     init() {
@@ -14,14 +15,38 @@ class DatabaseManager {
         }
         
         try {
-            // На Vercel serverless лучше не использовать SQLite
-            if (process.env.VERCEL || process.env.NODE_ENV === 'production') {
-                console.log('SQLite отключен на serverless окружении, используем только MongoDB');
+            // Проверяем, есть ли Turso URL (serverless SQLite)
+            const tursoUrl = process.env.TURSO_DATABASE_URL;
+            const tursoAuthToken = process.env.TURSO_AUTH_TOKEN;
+            
+            if (tursoUrl && tursoAuthToken) {
+                // Используем Turso (serverless SQLite)
+                const { createClient } = require('@libsql/client');
+                this.db = createClient({
+                    url: tursoUrl,
+                    authToken: tursoAuthToken
+                });
+                this.isTurso = true;
+                console.log('Turso (serverless SQLite) подключен');
+                // Для Turso нужно создать таблицы асинхронно
+                this.createTablesAsync().then(() => {
+                    this.initialized = true;
+                }).catch(err => {
+                    console.error('Ошибка создания таблиц в Turso:', err);
+                    this.initError = err;
+                    this.initialized = true;
+                });
+                return;
+            }
+            
+            // На Vercel без Turso - используем локальный SQLite только если не в продакшене
+            if (process.env.VERCEL && !tursoUrl) {
+                console.warn('⚠️ SQLite недоступен на Vercel без Turso. Настройте TURSO_DATABASE_URL и TURSO_AUTH_TOKEN');
                 this.initialized = true;
                 return;
             }
             
-            // Создаем папку database если её нет
+            // Локальный SQLite для разработки
             const dbPath = path.join(__dirname, 'tasks.db');
             this.db = new Database(dbPath);
             
@@ -32,7 +57,7 @@ class DatabaseManager {
             // Создаем таблицы из схемы
             this.createTables();
             
-            console.log('База данных инициализирована успешно');
+            console.log('Локальная база данных SQLite инициализирована успешно');
             this.initialized = true;
         } catch (error) {
             console.error('Ошибка инициализации базы данных:', error.message);
@@ -42,16 +67,29 @@ class DatabaseManager {
         }
     }
     
-    ensureInit() {
+    async ensureInit() {
         if (!this.initialized) {
             this.init();
+            // Для Turso ждем инициализации
+            if (this.isTurso) {
+                let attempts = 0;
+                while (!this.initialized && attempts < 50) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts++;
+                }
+            }
         }
         if (this.initError || !this.db) {
-            throw new Error('SQLite недоступен. Используйте MongoDB для продакшена.');
+            throw new Error('SQLite недоступен. Настройте TURSO_DATABASE_URL и TURSO_AUTH_TOKEN для продакшена.');
         }
     }
 
     createTables() {
+        if (this.isTurso) {
+            // Для Turso используем асинхронный метод
+            return this.createTablesAsync();
+        }
+        
         const fs = require('fs');
         const schemaPath = path.join(__dirname, 'schema.sql');
         
@@ -62,6 +100,35 @@ class DatabaseManager {
         } else {
             console.warn('Файл схемы не найден, создание таблиц пропущено');
         }
+    }
+    
+    async createTablesAsync() {
+        const fs = require('fs');
+        const schemaPath = path.join(__dirname, 'schema.sql');
+        
+        if (!fs.existsSync(schemaPath)) {
+            console.warn('Файл схемы не найден, создание таблиц пропущено');
+            return;
+        }
+        
+        const schema = fs.readFileSync(schemaPath, 'utf8');
+        // Разбиваем схему на отдельные команды
+        const statements = schema
+            .split(';')
+            .map(s => s.trim())
+            .filter(s => s.length > 0 && !s.startsWith('--'));
+        
+        for (const statement of statements) {
+            try {
+                await this.db.execute(statement);
+            } catch (err) {
+                // Игнорируем ошибки "table already exists"
+                if (!err.message.includes('already exists')) {
+                    console.warn('Ошибка выполнения SQL:', err.message);
+                }
+            }
+        }
+        console.log('Таблицы созданы в Turso');
     }
 
     // --- Вспомогательные методы для пользователей (SQLite) ---
@@ -113,47 +180,75 @@ class DatabaseManager {
     }
 
     // Методы для работы с предметами
-    getSubjects() {
-        this.ensureInit();
+    async getSubjects() {
+        await this.ensureInit();
         try {
-            const stmt = this.db.prepare('SELECT * FROM subjects ORDER BY name');
-            return Promise.resolve(stmt.all());
+            if (this.isTurso) {
+                const result = await this.db.execute('SELECT * FROM subjects ORDER BY name');
+                return result.rows.map(row => {
+                    const obj = {};
+                    for (const [key, value] of Object.entries(row)) {
+                        obj[key] = value;
+                    }
+                    return obj;
+                });
+            } else {
+                const stmt = this.db.prepare('SELECT * FROM subjects ORDER BY name');
+                return stmt.all();
+            }
         } catch (err) {
-            return Promise.reject(err);
+            throw err;
         }
     }
 
-    getSubjectById(id) {
+    async getSubjectById(id) {
+        await this.ensureInit();
         try {
-            const stmt = this.db.prepare('SELECT * FROM subjects WHERE id = ?');
-            return Promise.resolve(stmt.get(id));
+            if (this.isTurso) {
+                const result = await this.db.execute({
+                    sql: 'SELECT * FROM subjects WHERE id = ?',
+                    args: [id]
+                });
+                if (result.rows.length === 0) return null;
+                const row = result.rows[0];
+                const obj = {};
+                for (const [key, value] of Object.entries(row)) {
+                    obj[key] = value;
+                }
+                return obj;
+            } else {
+                const stmt = this.db.prepare('SELECT * FROM subjects WHERE id = ?');
+                return stmt.get(id);
+            }
         } catch (err) {
-            return Promise.reject(err);
+            throw err;
         }
     }
 
-    addSubject(name, code, description, examType) {
+    async addSubject(name, code, description, examType) {
+        await this.ensureInit();
         try {
-            const stmt = this.db.prepare(`
-                INSERT INTO subjects (name, code, description, exam_type) 
-                VALUES (?, ?, ?, ?)
-            `);
-            const result = stmt.run(name, code, description, examType);
-            return Promise.resolve({ lastInsertRowid: result.lastInsertRowid });
+            const result = await this.executeInsert(
+                `INSERT INTO subjects (name, code, description, exam_type) 
+                VALUES (?, ?, ?, ?)`,
+                [name, code, description, examType]
+            );
+            return result;
         } catch (err) {
-            return Promise.reject(err);
+            throw err;
         }
     }
 
     // Методы для работы с темами
-    getTopicsBySubject(subjectId) {
+    async getTopicsBySubject(subjectId) {
+        await this.ensureInit();
         try {
-            const stmt = this.db.prepare(`
-                SELECT * FROM topics 
+            return await this.executeQuery(
+                `SELECT * FROM topics 
                 WHERE subject_id = ? 
-                ORDER BY order_index, name
-            `);
-            return Promise.resolve(stmt.all(subjectId));
+                ORDER BY order_index, name`,
+                [subjectId]
+            );
         } catch (err) {
             return Promise.reject(err);
         }
