@@ -519,7 +519,8 @@ class DatabaseManager {
     }
 
     // Методы для работы с тестовыми вариантами
-    getTestVariants(subjectId = null) {
+    async getTestVariants(subjectId = null) {
+        await this.ensureInit();
         try {
             let query = `
                 SELECT tv.*, s.name as subject_name
