@@ -7,6 +7,7 @@ class DatabaseManager {
         this.initialized = false;
         this.initError = null;
         this.isTurso = false;
+        this.tablesCreated = false;
     }
 
     init() {
@@ -21,21 +22,21 @@ class DatabaseManager {
             
             if (tursoUrl && tursoAuthToken) {
                 // Используем Turso (serverless SQLite)
-                const { createClient } = require('@libsql/client');
-                this.db = createClient({
-                    url: tursoUrl,
-                    authToken: tursoAuthToken
-                });
-                this.isTurso = true;
-                console.log('Turso (serverless SQLite) подключен');
-                // Для Turso нужно создать таблицы асинхронно
-                this.createTablesAsync().then(() => {
+                try {
+                    const { createClient } = require('@libsql/client');
+                    this.db = createClient({
+                        url: tursoUrl,
+                        authToken: tursoAuthToken
+                    });
+                    this.isTurso = true;
+                    console.log('Turso (serverless SQLite) подключен');
+                    // Помечаем как инициализированную, таблицы создадутся при первом запросе
                     this.initialized = true;
-                }).catch(err => {
-                    console.error('Ошибка создания таблиц в Turso:', err);
-                    this.initError = err;
+                } catch (error) {
+                    console.error('Ошибка подключения к Turso:', error);
+                    this.initError = error;
                     this.initialized = true;
-                });
+                }
                 return;
             }
             
@@ -70,17 +71,28 @@ class DatabaseManager {
     async ensureInit() {
         if (!this.initialized) {
             this.init();
-            // Для Turso ждем инициализации
-            if (this.isTurso) {
-                let attempts = 0;
-                while (!this.initialized && attempts < 50) {
-                    await new Promise(resolve => setTimeout(resolve, 100));
-                    attempts++;
-                }
-            }
         }
-        if (this.initError || !this.db) {
+        
+        if (this.initError) {
+            throw new Error(`SQLite недоступен: ${this.initError.message}`);
+        }
+        
+        if (!this.db) {
             throw new Error('SQLite недоступен. Настройте TURSO_DATABASE_URL и TURSO_AUTH_TOKEN для продакшена.');
+        }
+        
+        // Для Turso создаем таблицы при первом использовании (если еще не созданы)
+        if (this.isTurso && !this.tablesCreated) {
+            try {
+                await this.createTablesAsync();
+                this.tablesCreated = true;
+            } catch (err) {
+                // Игнорируем ошибки "table already exists"
+                if (!err.message.includes('already exists') && !err.message.includes('duplicate')) {
+                    console.warn('Предупреждение при создании таблиц в Turso:', err.message);
+                }
+                this.tablesCreated = true;
+            }
         }
     }
 
