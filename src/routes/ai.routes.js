@@ -42,7 +42,7 @@ router.post('/chat', authenticate, async (req, res) => {
     const { message, userContext } = req.body;
 
     // Получаем релевантный контекст из базы заданий (RAG)
-    const ragContext = ragService.getContextForQuery(message, {
+    const ragContext = await ragService.getContextForQuery(message, {
       includeFewShot: true,
       maxTasks: 5
     });
@@ -250,7 +250,7 @@ router.post('/explain-topic', async (req, res) => {
     const { topic, subject, userLevel } = req.body;
 
     // Получаем примеры заданий по теме
-    const relevantTasks = ragService.searchTasksBySubjectAndTopic(
+    const relevantTasks = await ragService.searchTasksBySubjectAndTopic(
       subject || '',
       topic || '',
       3
@@ -361,7 +361,7 @@ router.post('/quick-solution', async (req, res) => {
     const { task, subject } = req.body;
 
     // Ищем похожие задания в базе
-    const relevantTasks = ragService.searchTasksByKeywords(task, 3);
+    const relevantTasks = await ragService.searchTasksByKeywords(task, 3);
     const ragContext = ragService.formatTasksForContext(relevantTasks);
 
     const systemPrompt = `Ты - эксперт по решению задач по ${subject || 'ОГЭ'}.

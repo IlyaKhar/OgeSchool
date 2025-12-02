@@ -1,5 +1,5 @@
 const path = require('path');
-const Database = require('better-sqlite3');
+const DatabaseManager = require('../../database/database-simple');
 
 /**
  * RAG Service - Retrieval-Augmented Generation
@@ -8,8 +8,7 @@ const Database = require('better-sqlite3');
 class RAGService {
   constructor() {
     try {
-      const dbPath = path.join(__dirname, '../../database/tasks.db');
-      this.db = new Database(dbPath);
+      this.db = new DatabaseManager();
       this.isAvailable = true;
     } catch (error) {
       console.warn('База данных заданий недоступна, RAG будет работать в ограниченном режиме:', error.message);
@@ -21,7 +20,7 @@ class RAGService {
   /**
    * Простой поиск по ключевым словам в тексте задания
    */
-  searchTasksByKeywords(query, limit = 5) {
+  async searchTasksByKeywords(query, limit = 5) {
     if (!this.isAvailable || !this.db) {
       return [];
     }
@@ -32,30 +31,16 @@ class RAGService {
         return [];
       }
 
-      // Создаем поисковый запрос с LIKE для каждого ключевого слова
-      const searchPattern = keywords.map(kw => `%${kw}%`).join(' OR ');
+      // Используем DatabaseManager для поиска
+      const allTasks = await this.db.getAllTasks(limit * 2, 0, {});
       
-      const tasks = this.db.prepare(`
-        SELECT 
-          t.id,
-          t.question_text,
-          t.correct_answer,
-          t.explanation,
-          t.solution_steps,
-          t.difficulty_level,
-          s.name as subject_name,
-          top.name as topic_name
-        FROM tasks t
-        LEFT JOIN subjects s ON t.subject_id = s.id
-        LEFT JOIN topics top ON t.topic_id = top.id
-        WHERE 
-          (t.question_text LIKE ? OR t.explanation LIKE ?)
-          AND t.explanation IS NOT NULL
-        ORDER BY t.difficulty_level, t.id
-        LIMIT ?
-      `).all(`%${keywords[0]}%`, `%${keywords[0]}%`, limit);
+      // Фильтруем по ключевым словам
+      const filtered = allTasks.filter(task => {
+        const text = `${task.question_text || ''} ${task.explanation || ''}`.toLowerCase();
+        return keywords.some(kw => text.includes(kw.toLowerCase())) && task.explanation;
+      });
 
-      return tasks;
+      return filtered.slice(0, limit);
     } catch (error) {
       console.error('Ошибка поиска заданий:', error);
       return [];
@@ -112,34 +97,28 @@ class RAGService {
   /**
    * Находит задания по предмету и теме
    */
-  searchTasksBySubjectAndTopic(subjectName, topicName, limit = 3) {
+  async searchTasksBySubjectAndTopic(subjectName, topicName, limit = 3) {
     if (!this.isAvailable || !this.db) {
       return [];
     }
 
     try {
-      const tasks = this.db.prepare(`
-        SELECT 
-          t.id,
-          t.question_text,
-          t.correct_answer,
-          t.explanation,
-          t.solution_steps,
-          t.difficulty_level,
-          s.name as subject_name,
-          top.name as topic_name
-        FROM tasks t
-        LEFT JOIN subjects s ON t.subject_id = s.id
-        LEFT JOIN topics top ON t.topic_id = top.id
-        WHERE 
-          LOWER(s.name) LIKE ? 
-          AND LOWER(top.name) LIKE ?
-          AND t.explanation IS NOT NULL
-        ORDER BY t.difficulty_level, t.id
-        LIMIT ?
-      `).all(`%${subjectName.toLowerCase()}%`, `%${topicName.toLowerCase()}%`, limit);
+      const subjects = await this.db.getSubjects();
+      const subject = subjects.find(s => s.name.toLowerCase().includes(subjectName.toLowerCase()));
+      
+      if (!subject) {
+        return [];
+      }
 
-      return tasks;
+      const topics = await this.db.getTopicsBySubject(subject.id);
+      const topic = topics.find(t => t.name.toLowerCase().includes(topicName.toLowerCase()));
+      
+      if (!topic) {
+        return [];
+      }
+
+      const tasks = await this.db.getTasksByTopic(topic.id, limit, 0);
+      return tasks.filter(t => t.explanation);
     } catch (error) {
       console.error('Ошибка поиска заданий по предмету/теме:', error);
       return [];
@@ -182,29 +161,18 @@ class RAGService {
   /**
    * Получает примеры заданий для few-shot learning
    */
-  getFewShotExamples(limit = 3) {
+  async getFewShotExamples(limit = 3) {
     if (!this.isAvailable || !this.db) {
       return [];
     }
 
     try {
-      const tasks = this.db.prepare(`
-        SELECT 
-          t.question_text,
-          t.correct_answer,
-          t.explanation,
-          t.solution_steps,
-          s.name as subject_name,
-          top.name as topic_name
-        FROM tasks t
-        LEFT JOIN subjects s ON t.subject_id = s.id
-        LEFT JOIN topics top ON t.topic_id = top.id
-        WHERE t.explanation IS NOT NULL
-        ORDER BY RANDOM()
-        LIMIT ?
-      `).all(limit);
-
-      return tasks;
+      const tasks = await this.db.getAllTasks(limit * 2, 0, {});
+      const withExplanation = tasks.filter(t => t.explanation);
+      
+      // Перемешиваем и берем первые limit
+      const shuffled = withExplanation.sort(() => Math.random() - 0.5);
+      return shuffled.slice(0, limit);
     } catch (error) {
       console.error('Ошибка получения примеров:', error);
       return [];
@@ -240,18 +208,18 @@ class RAGService {
   /**
    * Основной метод для получения контекста для AI
    */
-  getContextForQuery(query, options = {}) {
+  async getContextForQuery(query, options = {}) {
     const { includeFewShot = true, maxTasks = 5 } = options;
     
     // Ищем релевантные задания
-    const relevantTasks = this.searchTasksByKeywords(query, maxTasks);
+    const relevantTasks = await this.searchTasksByKeywords(query, maxTasks);
     
     // Форматируем контекст
     let context = this.formatTasksForContext(relevantTasks);
     
     // Добавляем few-shot примеры если нужно
     if (includeFewShot && relevantTasks.length === 0) {
-      const examples = this.getFewShotExamples(3);
+      const examples = await this.getFewShotExamples(3);
       context += this.formatFewShotExamples(examples);
     }
     
@@ -262,9 +230,8 @@ class RAGService {
    * Закрывает соединение с БД
    */
   close() {
-    if (this.db && this.isAvailable) {
-      this.db.close();
-    }
+    // DatabaseManager не требует закрытия для Turso
+    // Для локального SQLite закрытие не критично
   }
 }
 
