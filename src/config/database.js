@@ -14,13 +14,14 @@ const connectDB = async () => {
       return mongoose.connection;
     }
     
-    // Настройки для Vercel (увеличенные таймауты, отключена буферизация)
+    // Настройки для Vercel (увеличенные таймауты)
+    // Оставляем буферизацию включенной, но с ограничением времени
     await mongoose.connect(mongoURI, {
       serverSelectionTimeoutMS: 30000, // 30 секунд вместо 10
       socketTimeoutMS: 45000, // 45 секунд
       connectTimeoutMS: 30000, // 30 секунд
-      bufferMaxEntries: 0, // Отключаем буферизацию
-      bufferCommands: false, // Отключаем буферизацию команд
+      bufferMaxEntries: 100, // Ограничиваем буферизацию
+      bufferCommands: true, // Включаем буферизацию для работы до подключения
     });
     
     console.log('MongoDB подключена успешно');
