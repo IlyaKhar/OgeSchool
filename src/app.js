@@ -18,10 +18,16 @@ const app = express();
 
 // Подключение к MongoDB (если доступна)
 // На Vercel это может занять время, поэтому не блокируем запуск
-connectDB().catch((err) => {
-  console.error('Failed to connect to MongoDB:', err.message);
-  // Приложение продолжит работу, но без MongoDB функций
-});
+// Но важно начать подключение как можно раньше
+(async () => {
+  try {
+    await connectDB();
+    console.log('MongoDB connection initiated');
+  } catch (err) {
+    console.error('Failed to connect to MongoDB:', err.message);
+    // Приложение продолжит работу, но без MongoDB функций
+  }
+})();
 
 // Middleware
 // Базовая защита HTTP-заголовков

@@ -14,15 +14,22 @@ const connectDB = async () => {
       return mongoose.connection;
     }
     
-    // Настройки для Vercel (увеличенные таймауты)
-    // Оставляем буферизацию включенной, но с ограничением времени
-    await mongoose.connect(mongoURI, {
+    // Настройки для Vercel (увеличенные таймауты, буферизация включена)
+    // Важно: bufferCommands должен быть true, чтобы команды могли выполняться до подключения
+    const connectionOptions = {
       serverSelectionTimeoutMS: 30000, // 30 секунд вместо 10
       socketTimeoutMS: 45000, // 45 секунд
       connectTimeoutMS: 30000, // 30 секунд
       bufferMaxEntries: 100, // Ограничиваем буферизацию
-      bufferCommands: true, // Включаем буферизацию для работы до подключения
+      bufferCommands: true, // ВАЖНО: включаем буферизацию для работы до подключения
+    };
+    
+    console.log('Подключаемся к MongoDB с настройками:', {
+      serverSelectionTimeoutMS: connectionOptions.serverSelectionTimeoutMS,
+      bufferCommands: connectionOptions.bufferCommands
     });
+    
+    await mongoose.connect(mongoURI, connectionOptions);
     
     console.log('MongoDB подключена успешно');
     console.log(`📊 База данных: ${mongoose.connection.name}`);
@@ -30,6 +37,7 @@ const connectDB = async () => {
     return mongoose.connection;
   } catch (error) {
     console.error('Ошибка подключения к MongoDB:', error.message);
+    console.error('Stack:', error.stack);
     
     // Если MongoDB недоступна, продолжаем работу с SQLite
     console.log('Продолжаем работу с SQLite');
