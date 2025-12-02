@@ -161,29 +161,51 @@ class DatabaseManager {
         await this.ensureInit();
         if (this.isTurso) {
             try {
+                if (!this.db) {
+                    throw new Error('Turso connection not initialized');
+                }
                 // Serverless драйвер использует prepare().all()
                 const stmt = this.db.prepare(sql);
-                const rows = await stmt.all(args);
+                if (!stmt) {
+                    throw new Error('Failed to prepare statement');
+                }
+                const result = await stmt.all(args);
                 // Serverless драйвер возвращает объект с полем rows
-                if (!rows || !rows.rows || !Array.isArray(rows.rows)) {
+                if (!result) {
                     return [];
                 }
-                // rows.rows уже содержит объекты
-                return rows.rows;
+                // Проверяем разные форматы ответа
+                if (Array.isArray(result)) {
+                    return result;
+                }
+                if (result.rows && Array.isArray(result.rows)) {
+                    return result.rows;
+                }
+                return [];
             } catch (error) {
                 // Если таблица не существует, пытаемся создать таблицы и повторить
-                if (error.message && error.message.toLowerCase().includes('no such table')) {
+                const errMsg = error.message ? error.message.toLowerCase() : '';
+                if (errMsg.includes('no such table') || errMsg.includes('does not exist')) {
                     console.log('Таблица не найдена, создаем таблицы...');
                     if (!this.tablesCreated) {
                         this.tablesCreated = false; // Сбрасываем флаг
                         await this.ensureInit(); // Повторно создаем таблицы
                         // Повторяем запрос
-                        const stmt = this.db.prepare(sql);
-                        const rows = await stmt.all(args);
-                        return rows.rows || [];
+                        try {
+                            const stmt = this.db.prepare(sql);
+                            const result = await stmt.all(args);
+                            if (Array.isArray(result)) {
+                                return result;
+                            }
+                            return result?.rows || [];
+                        } catch (retryError) {
+                            console.error('Ошибка при повторном запросе:', retryError.message);
+                            throw retryError;
+                        }
                     }
                 }
-                console.error('Ошибка executeQuery (Turso):', error.message, 'SQL:', sql.substring(0, 100));
+                console.error('Ошибка executeQuery (Turso):', error.message, 'SQL:', sql.substring(0, 100), 'Args:', args);
+                console.error('Stack:', error.stack);
                 throw error;
             }
         } else {
