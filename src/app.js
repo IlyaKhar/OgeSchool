@@ -58,33 +58,10 @@ const aiLimiter = rateLimit({
 
 // Определяем путь к статическим файлам (на Vercel это корень проекта)
 const staticPath = path.join(__dirname, '..');
+console.log('Static files path:', staticPath);
 
-// Обработка статических файлов с правильными MIME типами
-// CSS файлы
-app.get('*.css', (req, res) => {
-  const filePath = path.join(staticPath, req.path);
-  res.type('text/css');
-  res.sendFile(filePath, (err) => {
-    if (err) {
-      console.error('CSS not found:', req.path);
-      res.status(404).send('/* CSS file not found */');
-    }
-  });
-});
-
-// JS файлы
-app.get('*.js', (req, res) => {
-  const filePath = path.join(staticPath, req.path);
-  res.type('application/javascript');
-  res.sendFile(filePath, (err) => {
-    if (err) {
-      console.error('JS not found:', req.path);
-      res.status(404).send('// JS file not found');
-    }
-  });
-});
-
-// Статика для остальных файлов (изображения, шрифты и т.д.)
+// Статика для всех файлов (CSS, JS, изображения и т.д.)
+// Важно: это должно быть ПЕРЕД API роутами
 app.use(express.static(staticPath, {
   setHeaders: (res, filePath) => {
     if (filePath.endsWith('.css')) {
@@ -97,12 +74,20 @@ app.use(express.static(staticPath, {
 
 // Обработка корневого пути
 app.get('/', (req, res) => {
-  res.sendFile(path.join(staticPath, 'index.html'));
+  const indexPath = path.join(staticPath, 'index.html');
+  console.log('Serving index.html from:', indexPath);
+  res.sendFile(indexPath, (err) => {
+    if (err) {
+      console.error('Error serving index.html:', err.message);
+      res.status(500).send('Internal server error');
+    }
+  });
 });
 
 // Обработка HTML страниц
 app.get('*.html', (req, res) => {
   const filePath = path.join(staticPath, req.path);
+  console.log('Serving HTML:', req.path, 'from:', filePath);
   res.sendFile(filePath, (err) => {
     if (err) {
       console.error('HTML file not found:', req.path, err.message);
